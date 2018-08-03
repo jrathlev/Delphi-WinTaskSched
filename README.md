@@ -14,5 +14,5 @@ time schedules for user applications are available.
 
  - Unit **TaskSchedApi.pas** - Delphi interface to Windows Task Scheduler 2.0 (*taskschd.dll*)
  - Unit **WinTask.pas** - Delphi objects to use Windows Task Scheduler 2.0 in own programs
- - Unit **WinTaskConsts.pas** - language resources for WinTask.pas (English and German)
- - Programm **TaskSchedTest.dpr** - Sample program
+ - Unit **WinTaskConsts.pas** - language resources for *WinTask.pas* (English and German)
+ - Program **TaskSchedTest.dpr** - Sample program
