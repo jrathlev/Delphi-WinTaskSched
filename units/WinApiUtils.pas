@@ -188,14 +188,6 @@ const
   NameSamCompatible            = 2;    // from secur32.dll
 
 type
-  TLongWord = record
-    case integer of
-    0 : (LongWord : cardinal);
-    1 : (Lo,Hi : word);
-    2 : (LoL,LoH,HiL,HiH : byte);
-    3 : (Bytes : array [0..3] of Byte);
-    end;
-
   TLuidArray = array of TLuid;
   USHORT = word;
 
@@ -207,7 +199,7 @@ type
   LSA_UNICODE_STRING = _LSA_UNICODE_STRING;
 
   _SECURITY_LOGON_TYPE = (
-    seltFiller0, seltFiller1,
+    seltError, seltFiller1,
     Interactive,
     Network,
     Batch,
@@ -388,13 +380,10 @@ type
   TSessionList = array of TSessionData;
 
 
-function GetTickCount64: ULONGLONG; stdcall;
 {$EXTERNALSYM GetTickCount64}
+function GetTickCount64: ULONGLONG; stdcall;
 
 { ---------------------------------------------------------------- }
-{$EXTERNALSYM SetSuspendState}
-function SetSuspendState(Hibernate, ForceCritical, DisableWakeEvent: Boolean): Boolean;
-
 {$EXTERNALSYM GetFileSizeEx}
 function GetFileSizeEx(hFile: THandle; lpFileSize : Large_Integer): BOOL; stdcall;
 
@@ -452,12 +441,17 @@ function FindNextVolumeMountPoint(hFindVolumeMountPoint: THandle;
   lpszVolumeMountPoint: LPWSTR; cchBufferLength: DWORD): BOOL; stdcall;
 
 { ---------------------------------------------------------------- }
+// available since Win 2000
 function CreateProcessWithLogonW(lpUsername: PWideChar;
   lpDomain: PWideChar; lpPassword: PWideChar; dwLogonFlags: DWORD;
   lpApplicationName: PWideChar; lpCommandLine: PWideChar;
   dwCreationFlags: DWORD; lpEnvironment: Pointer;
   lpCurrentDirectory: PWideChar; const lpStartupInfo: TStartupInfoW;
-  var lpProcessInformation: TProcessInformation): BOOL; stdcall;
+  var lpProcessInformation: TProcessInformation): BOOL;
+
+{ ---------------------------------------------------------------- }
+// available since Win 2000
+function SetSuspendState(Hibernate, ForceCritical, DisableWakeEvent: Boolean): Boolean;
 
 { ---------------------------------------------------------------- }
 // alternate file streams
@@ -559,9 +553,12 @@ function GetLUIDsFromProcesses(ExcludeProcess : dword; var SessionLuidList : TLu
 function GetUserSessionData (var SessionData : TSessionData) : boolean;
 function GetUserLogonTime : TDateTime;
 function GetUserSidString : string;
+function GetUserLogonType (const Username : string) : TSecurityLogonType;
 
 // Get elevation status of user
 function IsElevatedUser : boolean;
+function IsInteractiveUser (const Username : string) : boolean;
+function IsBatchUser (const Username : string) : boolean;
 
 // Enumerate Logon Sessions (exclude all stale logon sessions)
 function GetInteractiveUserSessions (var UserSessions : TSessionList) : boolean;
@@ -1444,75 +1441,79 @@ var
   FLsaFreeReturnBuffer : TLsaFreeReturnBuffer;            // ab Win 2000
 begin
   result:=false;
-  Secur32Handle:=LoadLibrary(secur32);
-  if Secur32Handle=0 then Exit;
-  FLsaEnumerateLogonSessions:=GetProcAddress(Secur32Handle,'LsaEnumerateLogonSessions');
-  if not assigned(FLsaEnumerateLogonSessions) then Exit;
-  FLsaGetLogonSessionData:=GetProcAddress(Secur32Handle,'LsaGetLogonSessionData');
-  if not assigned(FLsaGetLogonSessionData) then Exit;
-  FLsaFreeReturnBuffer:=GetProcAddress(Secur32Handle,'LsaFreeReturnBuffer');
-  if not assigned(FLsaFreeReturnBuffer) then Exit;
-  Wtsapi32Handle:=LoadLibrary(wtsapi32);
-  if Wtsapi32Handle=0 then Exit;
-  FWTSQuerySessionInformation:=GetProcAddress(Wtsapi32Handle,'WTSQuerySessionInformationW');
-  if not assigned(FWTSQuerySessionInformation) then Exit;
-  DllHandle:=GetModuleHandle(kernel32);
-  if DllHandle=0 then Exit;
-  FWTSGetActiveConsoleSessionId:=GetProcAddress(DllHandle,'WTSGetActiveConsoleSessionId');
-  if not assigned(FWTSGetActiveConsoleSessionId) then Exit;
-  //Auflisten der LogOnSessions
   try
-    if (LsaNtStatusToWinError(FLsaEnumerateLogonSessions(Count,SessionList))=0) then begin
-      Luid:=SessionList;
-      if Count > 0 then repeat
-        // Prüfe auf mögliche Fehler (z.B. Access denied)
-        if LsaNtStatusToWinError(FLsaGetLogonSessionData(Luid,PSesDat))=0 then begin
-          // Prüfe, ob es sich um eine Konsolen- oder Remote-Anmeldung handelt
-          if (PSesDat^.LogonType=Interactive) or (PSesDat^.LogonType=RemoteInteractive) then begin
-            SizeNeeded:=MAX_PATH;
-            SizeNeeded2:= MAX_PATH;
-            GetMem(OwnerName, MAX_PATH);
-            GetMem(DomainName, MAX_PATH);
-            try
-              if LookupAccountSID(nil, PSesDat^.SID, OwnerName,SizeNeeded,DomainName,SizeNeeded2,
-                              OwnerType) then begin
-                // Prüfen ob es sich um einen Benutzer handelt und ob es die
-                // SessionId des aufrufenden Prozesses ist
-                if (OwnerType=1) and ProcessIdToSessionId(GetCurrentProcessId,sid)
-                    and(PSesDat^.Session=sid) then begin
-                  if FWTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE,
-                      PSesDat^.Session, WTSConnectState,pBuffer,pBytesreturned) then begin
-                    if WTS_CONNECTSTATE_CLASS(pBuffer^) = WTSActive then with SessionData do begin
-                      UserLuid:=Luid^;
-                      UserName:=PSesDat^.UserName.Buffer;
-                      Domain:=PSesDat^.LogonDomain.Buffer;
-                      LogonType:=PSesDat^.LogonType;
-                      LogonTime:=Now;
-                      if FileTimeToLocalFileTime(TFileTime(PSesDat^.LogonTime),LocalFileTime) then
-                        LogonTime:=FileTimeToDateTime(LocalFileTime);
-                      result:=true;
+    Secur32Handle:=LoadLibrary(secur32);
+    if Secur32Handle=0 then Exit;
+    FLsaEnumerateLogonSessions:=GetProcAddress(Secur32Handle,'LsaEnumerateLogonSessions');
+    if not assigned(FLsaEnumerateLogonSessions) then Exit;
+    FLsaGetLogonSessionData:=GetProcAddress(Secur32Handle,'LsaGetLogonSessionData');
+    if not assigned(FLsaGetLogonSessionData) then Exit;
+    FLsaFreeReturnBuffer:=GetProcAddress(Secur32Handle,'LsaFreeReturnBuffer');
+    if not assigned(FLsaFreeReturnBuffer) then Exit;
+    Wtsapi32Handle:=LoadLibrary(wtsapi32);
+    if Wtsapi32Handle=0 then Exit;
+    FWTSQuerySessionInformation:=GetProcAddress(Wtsapi32Handle,'WTSQuerySessionInformationW');
+    if not assigned(FWTSQuerySessionInformation) then Exit;
+    DllHandle:=GetModuleHandle(kernel32);
+    if DllHandle=0 then Exit;
+    FWTSGetActiveConsoleSessionId:=GetProcAddress(DllHandle,'WTSGetActiveConsoleSessionId');
+    if not assigned(FWTSGetActiveConsoleSessionId) then Exit;
+    //Auflisten der LogOnSessions
+    try
+      if (LsaNtStatusToWinError(FLsaEnumerateLogonSessions(Count,SessionList))=0) then begin
+        Luid:=SessionList;
+        if Count > 0 then repeat
+          // Prüfe auf mögliche Fehler (z.B. Access denied)
+          if LsaNtStatusToWinError(FLsaGetLogonSessionData(Luid,PSesDat))=0 then begin
+            // Prüfe, ob es sich um eine Konsolen- oder Remote-Anmeldung handelt
+            if (PSesDat^.LogonType=Interactive) or (PSesDat^.LogonType=RemoteInteractive) then begin
+              SizeNeeded:=MAX_PATH;
+              SizeNeeded2:= MAX_PATH;
+              GetMem(OwnerName, MAX_PATH);
+              GetMem(DomainName, MAX_PATH);
+              try
+                if LookupAccountSID(nil, PSesDat^.SID, OwnerName,SizeNeeded,DomainName,SizeNeeded2,
+                                OwnerType) then begin
+                  // Prüfen ob es sich um einen Benutzer handelt und ob es die
+                  // SessionId des aufrufenden Prozesses ist
+                  if (OwnerType=1) and ProcessIdToSessionId(GetCurrentProcessId,sid)
+                      and(PSesDat^.Session=sid) then begin
+                    if FWTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE,
+                        PSesDat^.Session, WTSConnectState,pBuffer,pBytesreturned) then begin
+                      if WTS_CONNECTSTATE_CLASS(pBuffer^) = WTSActive then with SessionData do begin
+                        UserLuid:=Luid^;
+                        UserName:=PSesDat^.UserName.Buffer;
+                        Domain:=PSesDat^.LogonDomain.Buffer;
+                        LogonType:=PSesDat^.LogonType;
+                        LogonTime:=Now;
+                        if FileTimeToLocalFileTime(TFileTime(PSesDat^.LogonTime),LocalFileTime) then
+                          LogonTime:=FileTimeToDateTime(LocalFileTime);
+                        result:=true;
+                        end;
                       end;
+                    FLSAFreeReturnBuffer(pBuffer);
                     end;
-                  FLSAFreeReturnBuffer(pBuffer);
                   end;
+              finally
+                FreeMem(OwnerName);
+                FreeMem(DomainName);
                 end;
-            finally
-              FreeMem(OwnerName);
-              FreeMem(DomainName);
               end;
             end;
-          end;
-        inc(Luid);
-        dec(Count);
-        try
-          FLSAFreeReturnBuffer(PSesDat);
-        except
-          end;
-        until (Count=0) or result;
-      end;
+          inc(Luid);
+          dec(Count);
+          try
+            FLSAFreeReturnBuffer(PSesDat);
+          except
+            end;
+          until (Count=0) or result;
+        end;
+    finally
+      FLSAFreeReturnBuffer(SessionList);
+      end
   finally
-    FLSAFreeReturnBuffer(SessionList);
-    FreeLibrary(Wtsapi32Handle); FreeLibrary(Secur32Handle);
+    try FreeLibrary(Wtsapi32Handle); except end;
+    try FreeLibrary(Secur32Handle); except end;
     end;
   end;
 
@@ -1549,6 +1550,64 @@ begin
       end;
     end
   else Result:=true;
+  end;
+
+function GetUserLogonType (const Username : string) : TSecurityLogonType;
+var
+  ss : string;
+  Count: cardinal;
+  SessionList,Luid: PLUID;
+  PSesDat: PSecurityLogonSessionData;
+  Secur32Handle : THandle;
+  FLsaEnumerateLogonSessions : TLsaEnumerateLogonSessions; // ab Win XP
+  FLsaGetLogonSessionData : TLsaGetLogonSessionData;      // ab Win 2000
+  FLsaFreeReturnBuffer : TLsaFreeReturnBuffer;            // ab Win 2000
+begin
+  Result:=seltError;
+  try
+    Secur32Handle:=LoadLibrary(secur32);
+    if Secur32Handle=0 then Exit;
+    FLsaEnumerateLogonSessions:=GetProcAddress(Secur32Handle,'LsaEnumerateLogonSessions');
+    if not assigned(FLsaEnumerateLogonSessions) then Exit;
+    FLsaGetLogonSessionData:=GetProcAddress(Secur32Handle,'LsaGetLogonSessionData');
+    if not assigned(FLsaGetLogonSessionData) then Exit;
+    FLsaFreeReturnBuffer:=GetProcAddress(Secur32Handle,'LsaFreeReturnBuffer');
+    if not assigned(FLsaFreeReturnBuffer) then Exit;
+    try
+      if (LsaNtStatusToWinError(FLsaEnumerateLogonSessions(Count,SessionList))=0) then begin
+        Luid:=SessionList;
+        if Count > 0 then repeat
+          // Prüfe auf mögliche Fehler (z.B. Access denied)
+          if LsaNtStatusToWinError(FLsaGetLogonSessionData(Luid,PSesDat))=0 then begin
+            if AnsiSameText(Username,PSesDat^.UserName.Buffer) then Result:=PSesDat^.LogonType;
+            end;
+          inc(Luid);
+          dec(Count);
+          try
+            FLSAFreeReturnBuffer(PSesDat);
+          except
+            end;
+          until (Count<=0) or (Result<>seltError);
+        end
+    finally
+      FLSAFreeReturnBuffer(SessionList);
+      end;
+  finally
+    try FreeLibrary(Secur32Handle); except end;
+    end;
+  end;
+
+function IsInteractiveUser (const Username : string) : boolean;
+var
+  lt : TSecurityLogonType;
+begin
+  lt:=GetUserLogonType(UserName);
+  Result:=(lt=Interactive) or (lt=RemoteInteractive);
+  end;
+
+function IsBatchUser (const Username : string) : boolean;
+begin
+  Result:=GetUserLogonType(UserName)=Batch;
   end;
 
 { ---------------------------------------------------------------- }
@@ -1680,45 +1739,48 @@ var
   FLsaFreeReturnBuffer : TLsaFreeReturnBuffer;            // ab Win 2000
 begin
   Result:=false;
-  Secur32Handle:=LoadLibrary(secur32);
-  if Secur32Handle=0 then Exit;
-  FLsaEnumerateLogonSessions:=GetProcAddress(Secur32Handle,'LsaEnumerateLogonSessions');
-  if not assigned(FLsaEnumerateLogonSessions) then Exit;
-  FLsaGetLogonSessionData:=GetProcAddress(Secur32Handle,'LsaGetLogonSessionData');
-  if not assigned(FLsaGetLogonSessionData) then Exit;
-  FLsaFreeReturnBuffer:=GetProcAddress(Secur32Handle,'LsaFreeReturnBuffer');
-  if not assigned(FLsaFreeReturnBuffer) then Exit;
-  // Get LUIDs from running processes
-  if GetLUIDsFromProcesses(GetCurrentProcessId,ProcSessions)<>NO_ERROR then Exit;
-  // Enumerate LogOnSessions
   try
-    if (LsaNtStatusToWinError(FLsaEnumerateLogonSessions(Count,SessionList))=0) then begin
-      Luid:=SessionList;
-      for i:=0 to Count-1 do begin
-        // Prüfe auf mögliche Fehler (z.B. Access denied)
-        if LsaNtStatusToWinError(FLsaGetLogonSessionData(Luid,PSesDat))=0 then begin
-          // Prüfe, ob es sich um eine Konsolen- oder Remote-Anmeldung handelt
-          if ((PSesDat^.LogonType=Interactive) or (PSesDat^.LogonType=RemoteInteractive))
-              and HasProcess(PSesDat^.LogonId,ProcSessions) then begin
-            setlength(UserSessions,length(UserSessions)+1);
-            with UserSessions[High(UserSessions)] do begin
-              UserLuid:=Luid^;
-              UserName:=PSesDat^.UserName.Buffer;
-              DOmain:=PSesDat^.LogonDomain.Buffer;
-              LogonType:=PSesDat^.LogonType;
-              LogonTime:=Now;
-              if FileTimeToLocalFileTime(TFileTime(PSesDat^.LogonTime),LocalFileTime) then
-                LogonTime:=FileTimeToDateTime(LocalFileTime);
-              Result:=true;
+    Secur32Handle:=LoadLibrary(secur32);
+    if Secur32Handle=0 then Exit;
+    FLsaEnumerateLogonSessions:=GetProcAddress(Secur32Handle,'LsaEnumerateLogonSessions');
+    if not assigned(FLsaEnumerateLogonSessions) then Exit;
+    FLsaGetLogonSessionData:=GetProcAddress(Secur32Handle,'LsaGetLogonSessionData');
+    if not assigned(FLsaGetLogonSessionData) then Exit;
+    FLsaFreeReturnBuffer:=GetProcAddress(Secur32Handle,'LsaFreeReturnBuffer');
+    if not assigned(FLsaFreeReturnBuffer) then Exit;
+    // Get LUIDs from running processes
+    if GetLUIDsFromProcesses(GetCurrentProcessId,ProcSessions)<>NO_ERROR then Exit;
+    // Enumerate LogOnSessions
+    try
+      if (LsaNtStatusToWinError(FLsaEnumerateLogonSessions(Count,SessionList))=0) then begin
+        Luid:=SessionList;
+        for i:=0 to Count-1 do begin
+          // Prüfe auf mögliche Fehler (z.B. Access denied)
+          if LsaNtStatusToWinError(FLsaGetLogonSessionData(Luid,PSesDat))=0 then begin
+            // Prüfe, ob es sich um eine Konsolen- oder Remote-Anmeldung handelt
+            if ((PSesDat^.LogonType=Interactive) or (PSesDat^.LogonType=RemoteInteractive))
+                and HasProcess(PSesDat^.LogonId,ProcSessions) then begin
+              setlength(UserSessions,length(UserSessions)+1);
+              with UserSessions[High(UserSessions)] do begin
+                UserLuid:=Luid^;
+                UserName:=PSesDat^.UserName.Buffer;
+                Domain:=PSesDat^.LogonDomain.Buffer;
+                LogonType:=PSesDat^.LogonType;
+                LogonTime:=Now;
+                if FileTimeToLocalFileTime(TFileTime(PSesDat^.LogonTime),LocalFileTime) then
+                  LogonTime:=FileTimeToDateTime(LocalFileTime);
+                Result:=true;
+                end;
               end;
             end;
+          inc(Luid);
+          try FLSAFreeReturnBuffer(PSesDat); except end;
           end;
-        inc(Luid);
-        try FLSAFreeReturnBuffer(PSesDat); except end;
         end;
+    finally
+      FLSAFreeReturnBuffer(SessionList);
       end;
   finally
-    FLSAFreeReturnBuffer(SessionList);
     FreeLibrary(Secur32Handle);
     end;
   end;
