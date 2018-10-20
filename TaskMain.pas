@@ -67,21 +67,24 @@ implementation
 
 {$R *.dfm}
 
-uses System.Win.ComObj, System.DateUtils, Vcl.FileCtrl, Winapi.ActiveX, WinApiUtils;
+uses System.Win.ComObj, System.DateUtils, Vcl.FileCtrl, Winapi.ActiveX,
+  WinUtils, WinApiUtils;
 
 procedure TMainForm.FormCreate(Sender: TObject);
+var
+  hr : HResult;
 begin
 //  CoInitializeEx(nil,COINIT_MULTITHREADED);
-  if TWinTaskScheduler.IsRunning then begin
-    WinTasks:=TWinTaskScheduler.Create;
-    if not WinTasks.Init then begin
-      MessageDlg('Task scheduler is not running!',mtError,[mbOK],0);
+  hr:=CreateWinTaskScheduler(WinTasks);
+  if failed(hr) then begin
+    if hr=NotAvailOnXp then begin
+      MessageDlg('Windows Task Scheduler 2.0 requires at least Windows Vista',mtError,[mbOK],0);
+      Halt(1)
+      end
+    else begin
+      MessageDlg('Error initializing TWinTaskScheduler - '+SystemErrorMessage(hr),mtError,[mbOK],0);
       Halt(2)
       end;
-    end
-  else begin
-    MessageDlg('Task scheduler is not running!',mtError,[mbOK],0);
-    Halt(1);
     end;
   un:=UserFullname;
   un:=Username;
@@ -222,7 +225,7 @@ begin
 procedure TMainForm.btnDeleteClick(Sender: TObject);
 begin
   if SelectedTaskIndex>=0 then with WinTasks.TaskFolder do begin
-    if not DeleteTask(Tasks[SelectedTaskIndex].TaskName) then
+    if failed(DeleteTask(Tasks[SelectedTaskIndex].TaskName)) then
       MessageDlg(ErrorMessage,mtError,[mbOK],0)
     else begin
       UpdateListeView(SelectedTaskIndex);
