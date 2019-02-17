@@ -11,7 +11,7 @@
    the specific language governing rights and limitations under the License.
 
    Vers. 1.0 - Oct. 2017
-   last modified: Vers. 1.3 - Jan. 2018
+   last modified: Vers. 1.4 - Feb. 2019
    *)
 
 unit WinTask;
@@ -272,6 +272,8 @@ type
     procedure SetUserId (Value : string);
     function GetLogonType : TLogonType;
     procedure SetLogonType (Value : TLogonType);
+    function GetRunLevel : boolean;
+    procedure SetRunLevel (Value : boolean);
     function GetCompatibility : TWinTaskCompatibility;
     procedure SetCompatibility (Value : TWinTaskCompatibility);
     function GetCompatibilityAsString : string;
@@ -306,6 +308,7 @@ type
     property Id : string read GetId write SetId;
     property LogonType : TLogonType read GetLogonType write SetLogonType;
     property RunIfMissed : boolean read GetRunIfMissed write SetRunIfMissed;
+    property HighestRunLevel : boolean read GetRunLevel write SetRunLevel;
     property SelectedAction : integer read FSelectedAction;
     property Triggers[Index: Integer] : TWinTaskTrigger read GetTrigger;
     property TriggerCount : integer read GetTriggerCount;
@@ -1453,6 +1456,17 @@ begin
 procedure TWinTask.SetLogonType (Value : TLogonType);
 begin
   pDefinition.Principal.LogonType:=TaskFlags[Value];
+  end;
+
+function TWinTask.GetRunLevel : boolean;
+begin
+  Result:=pDefinition.Principal.RunLevel=TASK_RUNLEVEL_HIGHEST;
+  end;
+
+procedure TWinTask.SetRunLevel (Value : boolean);
+begin
+  with pDefinition.Principal do if Value then RunLevel:=TASK_RUNLEVEL_HIGHEST
+  else RunLevel:=TASK_RUNLEVEL_LUA;
   end;
 
 function TWinTask.GetCompatibility : TWinTaskCompatibility;

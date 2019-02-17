@@ -506,7 +506,7 @@ function ComputerName : string;
 { ---------------------------------------------------------------- }
 // nachfolgende Funktionen sind nur ab Vista verfügbar
 // dort erforderlich, um bei WM_QUERYENDSESSION das Abmelden/Herunterfahren zu unterbrechen
-function SetShutDownReason (fHandle: hWnd; Reason : string) : boolean;
+function SetShutDownReason (fHandle: hWnd; const Reason : string) : boolean;
 function ClearShutDownReason (fHandle: hWnd) : boolean;
 function QueryShutDownReason (fHandle: hWnd; var Reason : string) : boolean;
 
@@ -681,7 +681,7 @@ type
 
 // nachfolgende Funktionen sind nur ab Vista verfügbar
 // dort erforderlich, um bei WM_QUERYENDSESSION das Abmelden/Herunterfahren zu unterbrechen
-function SetShutDownReason (fHandle: hWnd; Reason : string) : boolean;
+function SetShutDownReason (fHandle: hWnd; const Reason : string) : boolean;
 var
   dh  : THandle;
   sdc : TSDBlockReasonCreate;
