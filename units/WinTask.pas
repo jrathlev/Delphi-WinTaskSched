@@ -11,7 +11,7 @@
    the specific language governing rights and limitations under the License.
 
    Vers. 1.0 - Oct. 2017
-   last modified: Vers. 1.4 - Feb. 2019
+   last modified: Vers. 1.5 - March 2019
    *)
 
 unit WinTask;
@@ -279,9 +279,21 @@ type
     function GetCompatibilityAsString : string;
     function GetRunIfMissed : boolean;
     procedure SetRunIfMissed (Value : boolean);
-    function GetAction(Index: Integer) : TWinTaskAction;
+    function GetRunOnlyIfNetwork : boolean;
+    procedure SetRunOnlyIfNetwork (Value : boolean);
+    function GetHidden : boolean;
+    procedure SetHidden (Value : boolean);
+    function GetDisallowOnBatteries : boolean;
+    procedure SetDisallowOnBatteries (Value : boolean);
+    function GetStopOnBatteries : boolean;
+    procedure SetStopOnBatteries (Value : boolean);
+    function GetPriority : TThreadPriority;
+    procedure SetPriority (Value : TThreadPriority);
+    function GetWakeToRun : boolean;
+    procedure SetWakeToRun (Value : boolean);
+    function GetAction (Index: Integer) : TWinTaskAction;
     function GetActionCount : Integer;
-    function GetTrigger(Index: Integer) : TWinTaskTrigger;
+    function GetTrigger (Index: Integer) : TWinTaskTrigger;
     function GetTriggerCount : Integer;
   public
     constructor Create(const ADefinition : ITaskDefinition);
@@ -302,17 +314,23 @@ type
     property Date : TDateTime read GetDate write SetDate;
     property DateAsString : string read GetDateAsString;
     property Description : string read GetDescription write SetDescription;
+    property DisallowOnBatteries : boolean read GetDisallowOnBatteries write SetDisallowOnBatteries;
     property DisplayName : string read GetDisplayName write SetDisplayName;
     property Documentation : string read GetDocumentation write SetDocumentation;
     property GroupId : string read GetGroupId write SetGroupId;
+    property Hidden : boolean read GetHidden write SetHidden;
     property Id : string read GetId write SetId;
     property LogonType : TLogonType read GetLogonType write SetLogonType;
+    property Priority : TThreadPriority read GetPriority write SetPriority;
     property RunIfMissed : boolean read GetRunIfMissed write SetRunIfMissed;
     property HighestRunLevel : boolean read GetRunLevel write SetRunLevel;
+    property RunOnlyIfNetwork : boolean read GetRunOnlyIfNetwork write SetRunOnlyIfNetwork;
     property SelectedAction : integer read FSelectedAction;
+    property StopOnBatteries : boolean read GetStopOnBatteries write SetStopOnBatteries;
     property Triggers[Index: Integer] : TWinTaskTrigger read GetTrigger;
     property TriggerCount : integer read GetTriggerCount;
     property UserId : string read GetUserId write SetUserId;
+    property WakeToRun : boolean read GetWakeToRun  write SetWakeToRun;
     end;
 
   TWinRegisteredTask = class (TObject)
@@ -456,6 +474,8 @@ var
   Compatibilities : array[TWinTaskCompatibility] of LongWord =
     (TASK_COMPATIBILITY_AT,TASK_COMPATIBILITY_V1,TASK_COMPATIBILITY_V2,
      TASK_COMPATIBILITY_V2_1,TASK_COMPATIBILITY_V2_2);
+
+  Priorities : array[TThreadPriority] of integer = (10,9,7,5,3,1,0);
 
 {------------------------------------------------------------------- }
 function GetServiceStatusByName(const AServer,AServiceName : string) : TWinServiceState;
@@ -1498,6 +1518,73 @@ begin
 procedure TWinTask.SetRunIfMissed (Value : boolean);
 begin
   pDefinition.Settings.StartWhenAvailable:=Value;
+  end;
+
+function TWinTask.GetRunOnlyIfNetwork : boolean;
+begin
+  Result:=pDefinition.Settings.RunOnlyIfNetworkAvailable;
+  end;
+
+procedure TWinTask.SetRunOnlyIfNetwork (Value : boolean);
+begin
+  pDefinition.Settings.RunOnlyIfNetworkAvailable:=Value;
+  end;
+
+function TWinTask.GetHidden : boolean;
+begin
+  Result:=pDefinition.Settings.Hidden;
+  end;
+
+procedure TWinTask.SetHidden (Value : boolean);
+begin
+  pDefinition.Settings.Hidden:=Value;
+  end;
+
+function TWinTask.GetDisallowOnBatteries : boolean;
+begin
+  Result:=pDefinition.Settings.DisallowStartIfOnBatteries;
+  end;
+
+procedure TWinTask.SetDisallowOnBatteries (Value : boolean);
+begin
+  pDefinition.Settings.DisallowStartIfOnBatteries:=Value;
+  end;
+
+function TWinTask.GetStopOnBatteries : boolean;
+begin
+  Result:=pDefinition.Settings.StopIfGoingOnBatteries;
+  end;
+
+procedure TWinTask.SetStopOnBatteries (Value : boolean);
+begin
+  pDefinition.Settings.StopIfGoingOnBatteries:=Value;
+  end;
+
+function TWinTask.GetPriority : TThreadPriority;
+begin
+  case pDefinition.Settings.Priority of
+  0 : Result:=tpTimeCritical;
+  1 : Result:=tpHighest;
+  2,3 : Result:=tpHigher;
+  7,8 : Result:=tpLower;
+  9,10 : Result:=tpIdle;
+  else Result:=tpNormal;
+    end;
+  end;
+
+procedure TWinTask.SetPriority (Value : TThreadPriority);
+begin
+  pDefinition.Settings.Priority:=Priorities[Value];
+  end;
+
+function TWinTask.GetWakeToRun : boolean;
+begin
+  Result:=pDefinition.Settings.WakeToRun;
+  end;
+
+procedure TWinTask.SetWakeToRun (Value : boolean);
+begin
+  pDefinition.Settings.WakeToRun:=Value;
   end;
 
 function TWinTask.GetAction(Index: Integer) : TWinTaskAction;
