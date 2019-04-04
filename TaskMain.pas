@@ -12,6 +12,7 @@
    the specific language governing rights and limitations under the License.
 
    Vers. 1.0 - Oct. 2017
+   last mofified: April 2019
    *)
 
 unit TaskMain;
@@ -53,7 +54,6 @@ type
     { Private-Deklarationen }
     WinTasks : TWinTaskScheduler;
     SelectedTaskIndex : integer;
-    un                : string;
     procedure UpdateListeView (AIndex : integer);
     procedure ShowData(Item: TListItem; Selected: Boolean);
   public
@@ -67,8 +67,7 @@ implementation
 
 {$R *.dfm}
 
-uses System.Win.ComObj, System.DateUtils, Vcl.FileCtrl, Winapi.ActiveX,
-  WinUtils, WinApiUtils;
+uses System.Win.ComObj, System.DateUtils, Vcl.FileCtrl, Winapi.ActiveX, WinApiUtils;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
@@ -82,12 +81,10 @@ begin
       Halt(1)
       end
     else begin
-      MessageDlg('Error initializing TWinTaskScheduler - '+SystemErrorMessage(hr),mtError,[mbOK],0);
+      MessageDlg('Error initializing TWinTaskScheduler: '+IntToHex(hr,8),mtError,[mbOK],0);
       Halt(2)
       end;
     end;
-  un:=UserFullname;
-  un:=Username;
   end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
