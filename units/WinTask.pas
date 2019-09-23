@@ -430,11 +430,7 @@ function CreateWinTaskScheduler (var TaskSchedule : TWinTaskScheduler) : HResult
 implementation
 
 uses System.Win.ComObj, System.DateUtils, System.Math, System.StrUtils, Winapi.ActiveX,
-  Winapi.WinSvc, System.Variants, ExtSysUtils, WinTaskConsts
-{$IFDEF Trace}
-  ,FileUtils
-{$EndIf}
-  ;
+  Winapi.WinSvc, System.Variants, WinTaskConsts;
 
 const
   TaskTriggerNames : array[TWinTaskTriggerType] of string =
@@ -476,6 +472,17 @@ var
      TASK_COMPATIBILITY_V2_1,TASK_COMPATIBILITY_V2_2);
 
   Priorities : array[TThreadPriority] of integer = (10,9,7,5,3,1,0);
+
+{ --------------------------------------------------------------- }
+// Format without raising an exception on errors
+function TryFormat(const AFormat: string; const Args: array of const): string;
+begin
+  try
+    Result:=Format(AFormat,Args);
+  except
+    on E:Exception do Result:=rsFormatError+AFormat;
+    end;
+  end;
 
 {------------------------------------------------------------------- }
 function GetServiceStatusByName(const AServer,AServiceName : string) : TWinServiceState;
@@ -1851,7 +1858,8 @@ begin
   Result:=-1; FErrMsg:=''; FErrorCode:=NO_ERROR;
   if ATask.LogonType=ltToken then begin
     Username:=''; Password:='';
-    end;
+    end
+  else if ATask.LogonType=ltService then Password:='';   // run as SYSTEM
   try
     pRegisteredTask:=pRootFolder.RegisterTaskDefinition(TaskName,ATask.pDefinition,
        TASK_CREATE_OR_UPDATE,Username,Password,TaskFlags[ATask.LogonType],'');
