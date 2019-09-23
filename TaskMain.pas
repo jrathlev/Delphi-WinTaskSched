@@ -68,7 +68,19 @@ implementation
 
 {$R *.dfm}
 
-uses System.Win.ComObj, System.DateUtils, Vcl.FileCtrl, Winapi.ActiveX, WinApiUtils;
+uses System.Win.ComObj, System.DateUtils, Vcl.FileCtrl, Winapi.ActiveX;
+
+function UserName : string;
+var
+  p : pchar;
+  size : dword;
+begin
+  size:=1024;
+  p:=StrAlloc(size);
+  GetUserName (p,size);
+  Result:=p;
+  Strdispose(p);
+  end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
