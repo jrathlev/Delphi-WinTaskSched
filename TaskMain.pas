@@ -160,12 +160,21 @@ const
     ('Not specified','User and password','Interactive token','As logged on user',
      'As group member','Local system or service','Interactive or passord');
 
+  procedure ShowPath (AEdit : TCustomEdit; const APath : string);
+  begin
+    with AEdit do begin
+      Text:=MinimizeName(APath,self.Canvas,Width);
+      ShowHint:=length(APath)>length(Text);
+      if ShowHint then Hint:=APath;
+      end;
+    end;
+
   procedure ShowText (AEdit : TCustomEdit; const AText : string);
   begin
     with AEdit do begin
-      Text:=MinimizeName(AText,self.Canvas,Width);
-      ShowHint:=length(AText)>length(Text);
-      if ShowHint then Hint:=AText;
+      Text:=AText;
+      ShowHint:=Canvas.TextWidth(AText)>Width;
+      if ShowHint then Hint:=WrapText(AText,80);
       end;
     end;
 
@@ -184,9 +193,9 @@ begin
 //      cbReRun.Checked:=RunIfMissed;
       if ActionCount>0 then with Actions[0] do if ActionType=taExec then
           with TWinTaskExecAction(Actions[0]) do begin
-        ShowText(edApplication,ApplicationPath);
+        ShowPath(edApplication,ApplicationPath);
         ShowText(edParameters,Arguments);
-        ShowText(edWorkDir,WorkingDirectory);
+        ShowPath(edWorkDir,WorkingDirectory);
         end
       else begin
         edApplication.Text:='';
