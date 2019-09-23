@@ -37,10 +37,11 @@ type
     edWorkDir: TLabeledEdit;
     lbTriggers: TListBox;
     btnDelete: TBitBtn;
-    btbEdit: TBitBtn;
+    btbNew: TBitBtn;
     btbCancel: TBitBtn;
     lvTasks: TListView;
     edCompat: TLabeledEdit;
+    edLogonType: TLabeledEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -48,7 +49,7 @@ type
     procedure lvTasksSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
     procedure FormResize(Sender: TObject);
-    procedure btbEditClick(Sender: TObject);
+    procedure btbNewClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
   private
     { Private-Deklarationen }
@@ -142,6 +143,11 @@ procedure TMainForm.ShowData(Item: TListItem; Selected: Boolean);
 var
   i  : integer;
 
+const
+  LogonTypes : array[TLogonType] of string =
+    ('Not specified','User and password','Interactive token','As logged on user',
+     'As group member','Local system or service','Interactive or passord');
+
   procedure ShowText (AEdit : TCustomEdit; const AText : string);
   begin
     with AEdit do begin
@@ -156,7 +162,9 @@ begin
     with WinTasks.TaskFolder.Tasks[integer(Item.Data)],Definition do begin
       gbDetails.Caption:='Properties of task: '+TaskName;
       ShowText(edStatus,StatusAsString);
-      ShowText(edUserAccount,UserId);
+      ShowText(edLogonType,LogonTypes[LogonType]);
+      if LogonType=ltGroup then ShowText(edUserAccount,GroupId)
+      else ShowText(edUserAccount,UserId);
       ShowText(edComment,Description);
       ShowText(edCreator,Author);
       ShowText(edStatus,DateAsString);
@@ -187,7 +195,7 @@ begin
   Close;
   end;
 
-procedure TMainForm.btbEditClick(Sender: TObject);
+procedure TMainForm.btbNewClick(Sender: TObject);
 var
   td : TWinTask;
   n  : integer;

@@ -24,6 +24,7 @@ object MainForm: TMainForm
     Height = 256
     Align = alBottom
     TabOrder = 0
+    ExplicitLeft = 55
     DesignSize = (
       727
       256)
@@ -35,9 +36,9 @@ object MainForm: TMainForm
       Caption = 'Time schedules:'
     end
     object edUserAccount: TLabeledEdit
-      Left = 505
+      Left = 455
       Top = 115
-      Width = 214
+      Width = 266
       Height = 21
       TabStop = False
       Anchors = [akLeft, akTop, akRight]
@@ -48,9 +49,9 @@ object MainForm: TMainForm
       TabOrder = 3
     end
     object edComment: TLabeledEdit
-      Left = 320
-      Top = 75
-      Width = 399
+      Left = 295
+      Top = 35
+      Width = 426
       Height = 21
       TabStop = False
       Anchors = [akLeft, akTop, akRight]
@@ -75,7 +76,7 @@ object MainForm: TMainForm
     object edStatus: TLabeledEdit
       Left = 175
       Top = 115
-      Width = 156
+      Width = 111
       Height = 21
       TabStop = False
       EditLabel.Width = 43
@@ -87,7 +88,7 @@ object MainForm: TMainForm
     object edApplication: TLabeledEdit
       Left = 10
       Top = 35
-      Width = 301
+      Width = 276
       Height = 21
       TabStop = False
       EditLabel.Width = 56
@@ -97,22 +98,22 @@ object MainForm: TMainForm
       TabOrder = 7
     end
     object edParameters: TLabeledEdit
-      Left = 320
-      Top = 35
-      Width = 399
+      Left = 10
+      Top = 75
+      Width = 276
       Height = 21
       TabStop = False
       Anchors = [akLeft, akTop, akRight]
-      EditLabel.Width = 60
+      EditLabel.Width = 56
       EditLabel.Height = 13
-      EditLabel.Caption = 'Arguments::'
+      EditLabel.Caption = 'Arguments:'
       ReadOnly = True
       TabOrder = 8
     end
     object edWorkDir: TLabeledEdit
-      Left = 10
+      Left = 295
       Top = 75
-      Width = 301
+      Width = 276
       Height = 21
       TabStop = False
       EditLabel.Width = 88
@@ -150,7 +151,7 @@ object MainForm: TMainForm
       TabOrder = 1
       OnClick = btnDeleteClick
     end
-    object btbEdit: TBitBtn
+    object btbNew: TBitBtn
       Left = 558
       Top = 145
       Width = 161
@@ -168,7 +169,7 @@ object MainForm: TMainForm
         1055555555555555030555555555555550555555555555555555}
       ModalResult = 1
       TabOrder = 0
-      OnClick = btbEditClick
+      OnClick = btbNewClick
     end
     object btbCancel: TBitBtn
       Left = 558
@@ -218,9 +219,9 @@ object MainForm: TMainForm
       OnClick = btbCancelClick
     end
     object edCompat: TLabeledEdit
-      Left = 340
-      Top = 115
-      Width = 156
+      Left = 580
+      Top = 75
+      Width = 141
       Height = 21
       TabStop = False
       EditLabel.Width = 65
@@ -228,6 +229,17 @@ object MainForm: TMainForm
       EditLabel.Caption = 'Compatibility:'
       ReadOnly = True
       TabOrder = 11
+    end
+    object edLogonType: TLabeledEdit
+      Left = 295
+      Top = 115
+      Width = 151
+      Height = 21
+      EditLabel.Width = 58
+      EditLabel.Height = 13
+      EditLabel.Caption = 'Logon type:'
+      ReadOnly = True
+      TabOrder = 12
     end
   end
   object lvTasks: TListView
