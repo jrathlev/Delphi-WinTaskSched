@@ -11,7 +11,7 @@
    the specific language governing rights and limitations under the License.
 
    Vers. 1.0 - Oct. 2017
-   last modified: Vers. 1.5 - March 2019
+   last modified: Vers. 1.6 - September 2019
    *)
 
 unit WinTask;
