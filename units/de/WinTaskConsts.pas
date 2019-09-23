@@ -20,6 +20,8 @@ unit WinTaskConsts;
 interface
 
 resourcestring 
+  rsFormatError  = 'Format-Fehler: ';
+
   rsTrgUnknown    = 'Unbekannt';
   rsTrgReady      = 'Bereit';  
   rsTrgQueued     = 'In Warteschlange';
