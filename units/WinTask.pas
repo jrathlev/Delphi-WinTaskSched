@@ -1690,6 +1690,7 @@ begin
 destructor TWinRegisteredTask.Destroy;
 begin
   pRegisteredTask:=nil;
+  FTask.Free; // <- avoid memory leak
   inherited Destroy;
   end;
 
