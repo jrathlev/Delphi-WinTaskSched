@@ -11,7 +11,7 @@
    the specific language governing rights and limitations under the License.
 
    Vers. 1.0 - Oct. 2017
-   last modified: Vers. 1.6 - September 2019
+   last modified: Vers. 1.7 - June 2020
    *)
 
 unit WinTask;
@@ -517,7 +517,7 @@ begin
           if QueryServiceStatus(ServiceHandle,ServiceStatus) then begin
             Result:=TWinServiceState(ServiceStatus.dwCurrentState);
 {$IFDEF Trace}
-            WriteDebugLog(TryFormat('Status of service "%s": %s',[AServiceName,WinServiceStates[ServiceStatus.dwCurrentState]]));
+//            WriteDebugLog(TryFormat('Status of service "%s": %s',[AServiceName,WinServiceStates[ServiceStatus.dwCurrentState]]));
 {$EndIf}
             end;
         finally
@@ -525,14 +525,14 @@ begin
           end;
         end
 {$IFDEF Trace}
-        else WriteDebugLog(TryFormat('Error opening service "%s" - ',[AServiceName])+SysErrorMessage(GetLastError));
+//        else WriteDebugLog(TryFormat('Error opening service "%s" - ',[AServiceName])+SysErrorMessage(GetLastError));
 {$EndIf}
     finally
       CloseServiceHandle(SCMHandle);
       end;
     end
 {$IFDEF Trace}
-  else WriteDebugLog('Error opening service mananger - '+SysErrorMessage(GetLastError));
+//  else WriteDebugLog('Error opening service mananger - '+SysErrorMessage(GetLastError));
 {$EndIf}
   end;
 
@@ -614,7 +614,7 @@ begin
     Result:=FormatDateTime('yyyy-mm-dd"T"hh:nn:ss',Value);
     if UseTimeZone then begin
       m:=TTimeZone.Local.UtcOffset.TotalMinutes;
-      if m=0 then Result:=Result+'Z'
+      if IsZero(m) then Result:=Result+'Z'
       else begin
         if m<0 then Result:=Result+'-' else Result:=Result+'+';
         Result:=Result+FormatDateTime('hh:nn',abs(m)/MinsPerDay);
@@ -1690,6 +1690,7 @@ begin
 destructor TWinRegisteredTask.Destroy;
 begin
   pRegisteredTask:=nil;
+  FreeAndNil(FTask);
   inherited Destroy;
   end;
 
