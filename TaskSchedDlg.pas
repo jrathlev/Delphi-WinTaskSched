@@ -660,12 +660,6 @@ begin
       end;
     edJobName.Text:=ATaskName;
     rgPriority.ItemIndex:=integer(Priority);
-//    case Priority of
-//    tpLowest : rgPriority.ItemIndex:=0;
-//    tpLower  : rgPriority.ItemIndex:=1;
-//    tpHigher : rgPriority.ItemIndex:=3;
-//    else rgPriority.ItemIndex:=2;
-//      end;
     leDesc.Text:=Description;
     if LogonType=ltToken then rbLoggedUser.Checked:=true else rbAnyUser.Checked:=true;
     ShowSecOptions;
