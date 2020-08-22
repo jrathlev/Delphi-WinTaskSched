@@ -11,7 +11,7 @@
    the specific language governing rights and limitations under the License.
 
    Vers. 1.0 - Oct. 2017
-   last modified: Vers. 1.7 - June 2020
+   last modified: Vers. 1.7 - August 2020
    *)
 
 unit WinTask;
@@ -1574,7 +1574,8 @@ begin
   1 : Result:=tpHighest;
   2,3 : Result:=tpHigher;
   7,8 : Result:=tpLower;
-  9,10 : Result:=tpIdle;
+  9  : Result:=tpLowest;
+  10 : Result:=tpIdle;
   else Result:=tpNormal;
     end;
   end;
@@ -1847,14 +1848,13 @@ begin
     end;
   end;
 
-// Result >=0: Number of new task
-//         <0: Error
+// Result >=0: Index of new task
+//         <0: Error - check ErrorCode and ErrorMessage
 function TWinTaskFolder.RegisterTask (const TaskName : string; ATask : TWinTask;
                                       Username,Password : string) : integer;
 var
   pRegisteredTask : IRegisteredTask;
   ARegTask : TWinRegisteredTask;
-  n : integer;
 begin
   Result:=-1; FErrMsg:=''; FErrorCode:=NO_ERROR;
   if ATask.LogonType=ltToken then begin
@@ -1866,20 +1866,9 @@ begin
        TASK_CREATE_OR_UPDATE,Username,Password,TaskFlags[ATask.LogonType],'');
     Refresh;
     Result:=IndexOf(TaskName);
-//    if n>=0 then begin
-//      ARegTask:=Tasks[n];
-//      ARegTask.Refresh;
-//      Result:=n;
-//      end
-//    else begin
-//      ARegTask:=TWinRegisteredTask.Create(pRegisteredTask);
-//      ARegTask.Refresh;
-//      ARegTask.TaskIndex:=FTasks.Add(ARegTask);
-//      Result:=ARegTask.TaskIndex;
-//      end;
   except
     on E:EOleSysError do with E do begin
-      FErrMsg:=Message; FErrorCode:= ErrorCode; Result:=ErrorCode;
+      FErrMsg:=Message; FErrorCode:=ErrorCode;
       end;
     end;
   end;
