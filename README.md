@@ -16,3 +16,5 @@ is included to the package.
 - Unit **WinTask.pas** - Delphi objects to use Windows Task Scheduler 2.0 in own programs
 - Unit **WinTaskConsts.pas** - language resources for WinTask.pas (English und German)
 - Program **TaskSchedTest.dpr** - Sample program (new enhanced version)
+
+[Executable demo](https://github.com/jrathlev/Delphi-WinTaskSched/tree/master/demo)
