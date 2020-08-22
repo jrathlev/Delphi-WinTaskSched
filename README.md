@@ -1,4 +1,4 @@
-###Delphi interface to Windows Task Scheduler 2.0
+### Delphi interface to Windows Task Scheduler 2.0
 
 Since Windows Vista a new version of the Task Scheduler is implemented. In 
 addition to the features of the former version some new options are available, 
