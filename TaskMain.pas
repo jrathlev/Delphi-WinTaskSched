@@ -38,24 +38,31 @@ type
     lbTriggers: TListBox;
     btnDelete: TBitBtn;
     btbNew: TBitBtn;
-    btbCancel: TBitBtn;
+    btbClose: TBitBtn;
     lvTasks: TListView;
     edCompat: TLabeledEdit;
     edLogonType: TLabeledEdit;
+    btbEdit: TBitBtn;
+    btbRun: TBitBtn;
+    Timer: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure btbCancelClick(Sender: TObject);
+    procedure btbCloseClick(Sender: TObject);
     procedure lvTasksSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
     procedure FormResize(Sender: TObject);
     procedure btbNewClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
+    procedure btbEditClick(Sender: TObject);
+    procedure btbRunClick(Sender: TObject);
+    procedure TimerTimer(Sender: TObject);
   private
     { Private-Deklarationen }
     WinTasks : TWinTaskScheduler;
     SelectedTaskIndex : integer;
-    procedure UpdateListeView (AIndex : integer);
+    function GetListIndex (ATaskIndex : integer) : integer;
+    procedure UpdateListView (AIndex : integer);
     procedure ShowData(Item: TListItem; Selected: Boolean);
   public
     { Public-Deklarationen }
@@ -68,19 +75,8 @@ implementation
 
 {$R *.dfm}
 
-uses System.Win.ComObj, System.DateUtils, Vcl.FileCtrl, Winapi.ActiveX;
-
-function UserName : string;
-var
-  p : pchar;
-  size : dword;
-begin
-  size:=1024;
-  p:=StrAlloc(size);
-  GetUserName (p,size);
-  Result:=p;
-  Strdispose(p);
-  end;
+uses System.Win.ComObj, System.DateUtils, Vcl.FileCtrl, Winapi.ActiveX,
+  TaskSchedDlg;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
@@ -118,14 +114,15 @@ begin
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
-  UpdateListeView(0);
+  UpdateListView(0);
   end;
 
-procedure TMainForm.UpdateListeView (AIndex : integer);
+procedure TMainForm.UpdateListView (AIndex : integer);
 var
   i : integer;
 begin
   lvTasks.Clear;
+  lvTasks.Items.BeginUpdate;
   with WinTasks.TaskFolder do begin
     for i:=0 to TaskCount-1 do with Tasks[i] do begin
       with lvTasks.Items.Add do begin
@@ -136,12 +133,13 @@ begin
         SubItems.Add(NextRunTimeAsString);
         end;
       end;
-    with lvTasks do begin
-      if AINdex>=Items.Count then AIndex:=Items.Count-1;
-      ItemIndex:=AIndex;
-      Invalidate;
-      Selected.MakeVisible(false);
-      end;
+    end;
+  lvTasks.Items.EndUpdate;
+  with lvTasks do if AIndex>=0 then begin
+    if AINdex>=Items.Count then AIndex:=Items.Count-1;
+    ItemIndex:=AIndex;
+    Invalidate;
+    Selected.MakeVisible(false);
     end;
   end;
 
@@ -154,7 +152,6 @@ begin
 procedure TMainForm.ShowData(Item: TListItem; Selected: Boolean);
 var
   i  : integer;
-
 const
   LogonTypes : array[TLogonType] of string =
     ('Not specified','User and password','Interactive token','As logged on user',
@@ -211,7 +208,23 @@ begin
     end
   end;
 
-procedure TMainForm.btbCancelClick(Sender: TObject);
+procedure TMainForm.TimerTimer(Sender: TObject);
+begin
+  UpdateListView(lvTasks.ItemIndex);
+//  ShowData(lvTasks.Items[lvTasks.ItemIndex],true);
+  end;
+
+function TMainForm.GetListIndex (ATaskIndex : integer) : integer;
+var
+  i  : integer;
+begin
+  Result:=-1;
+  with lvTasks.Items do for i:=0 to Count-1 do if integer(Item[i].Data)=ATaskIndex then begin
+    Result:=i; Break;
+    end;
+  end;
+
+procedure TMainForm.btbCloseClick(Sender: TObject);
 begin
   Close;
   end;
@@ -220,41 +233,89 @@ procedure TMainForm.btbNewClick(Sender: TObject);
 var
   td : TWinTask;
   n  : integer;
-  user,pwd : string;
+  sn,user,pwd : string;
+  ok : boolean;
 begin
-  User:=''; pwd:=''; ;
-  if SelectedTaskIndex>=0 then with WinTasks do begin
-    td:=NewTask; //Tasks[SelectedTaskIndex];
-    with td do begin
-      UserId:=UserName;
-      Description:='Test for new task';
-      LogOnType:=ltToken;   // as current user
-      Author:=UserId;
-      Date:=Now;
-      with TWinTaskExecAction(NewAction(taExec)) do begin
-        ApplicationPath:='c:\Windows\notepad.exe';
+  User:=''; pwd:=''; sn:='';
+  if InputQuery('Create new Task?','Name of task:',sn) then with WinTasks do begin
+    n:=TaskFolder.IndexOf(sn);
+    if n<0 then begin
+      td:=NewTask;
+      with td do begin
+        Description:='Test for new task';
+        LogOnType:=ltToken;   // as current user
+        Date:=Now;
         end;
-      with NewTrigger(ttWeekly) do begin
-        StartTime:=Now+1; EndTime:=Now+7; DaysOfWeek:=5;
-        Duration:=300; Interval:=60;
+      ok:=TaskScheduleDialog.Execute(sn,td,user,pwd);
+      end
+    else begin
+      ok:=MessageDlg('Task already exists - edit?',mtConfirmation,mbYesNo,0)=mrYes;
+      ok:=ok and TaskScheduleDialog.Execute(sn,TaskFolder.Tasks[n].Definition,user,pwd);
+      end;
+    if ok then begin
+      n:=TaskFolder.RegisterTask(sn,td,User,pwd);
+      if n<0 then MessageDlg(TaskFolder.ErrorMessage,mtError,[mbOK],0)
+      else begin
+        n:=GetListIndex(n);
+        UpdateListView(n);
+        ShowData(lvTasks.Items[n],true);
         end;
       end;
-    n:=TaskFolder.RegisterTask('Test-New',td,User,pwd);
-    if n<0 then MessageDlg(TaskFolder.ErrorMessage,mtError,[mbOK],0)
-    else begin
-      UpdateListeView(n);
-      ShowData(lvTasks.Items[n],true);
+    end;
+  end;
+
+procedure TMainForm.btbRunClick(Sender: TObject);
+begin
+  if (SelectedTaskIndex>=0) then with WinTasks.TaskFolder.Tasks[SelectedTaskIndex] do begin
+    if Status=tsReady then begin
+      if MessageDlg('Run selected task?',mtConfirmation,mbYesNo,0)=mrYes then Run;
+      end
+    else if Status=tsRunning then begin
+      if MessageDlg('Stop selected task?',mtConfirmation,mbYesNo,0)=mrYes then Stop;
+      end;
+    UpdateListView(GetListIndex(SelectedTaskIndex));
+    end;
+  end;
+
+procedure TMainForm.btbEditClick(Sender: TObject);
+var
+  user,pwd : string;
+  n        : integer;
+begin
+  if SelectedTaskIndex>=0 then with WinTasks.TaskFolder,Tasks[SelectedTaskIndex] do begin
+    if TaskScheduleDialog.Execute(TaskName,Definition,user,pwd) then begin
+      n:=RegisterTask(TaskName,Definition,user,pwd);
+      if n<0 then begin   // Error
+        if (ResultCode(ErrorCode)>=ERROR_LOGON_FAILURE)
+            and (ResultCode(ErrorCode)<=ERROR_NONE_MAPPED) then begin
+          MessageDlg('Invalid user or password!'+sLineBreak+
+                      'Could not create or modify scheduled task!',
+                     mtError,[mbOK],0);
+          end
+        else begin
+          MessageDlg(SysErrorMessage(ErrorCode)+' - "'+ErrorMessage+'"',
+                     mtError,[mbOK],0);
+          end;
+        Refresh;
+        end
+      else begin
+        n:=GetListIndex(n);
+        UpdateListView(n);
+        ShowData(lvTasks.Items[n],true);
+        end;
       end;
     end;
   end;
 
 procedure TMainForm.btnDeleteClick(Sender: TObject);
+var
+  sn : string;
 begin
   if SelectedTaskIndex>=0 then with WinTasks.TaskFolder do begin
-    if failed(DeleteTask(Tasks[SelectedTaskIndex].TaskName)) then
-      MessageDlg(ErrorMessage,mtError,[mbOK],0)
-    else begin
-      UpdateListeView(SelectedTaskIndex);
+    sn:=Tasks[SelectedTaskIndex].TaskName;
+    if MessageDlg(Format('Delete task "%s"?',[sn]),mtConfirmation,mbYesNo,0)=mrYes then begin
+      if failed(DeleteTask(sn)) then MessageDlg(ErrorMessage,mtError,[mbOK],0)
+      else UpdateListView(GetListIndex(SelectedTaskIndex));
       end;
     end;
   end;
