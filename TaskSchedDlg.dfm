@@ -29,6 +29,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
     TabOrder = 1
     object tsProgram: TTabSheet
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object edWorkDir: TLabeledEdit
         Left = 5
         Top = 110
@@ -132,6 +136,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
     object tsSchedule: TTabSheet
       ImageIndex = 1
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object pcSteps: TPageControl
         Left = 195
         Top = 5
@@ -496,6 +504,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
         object tsMonthly: TTabSheet
           ImageIndex = 2
           TabVisible = False
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object laMonth: TLabel
             Left = 10
             Top = 5
@@ -826,6 +838,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
         object tsOneTime: TTabSheet
           ImageIndex = 4
           TabVisible = False
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object Label18: TLabel
             Left = 25
             Top = 35
@@ -935,6 +951,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
         object tsEvent: TTabSheet
           ImageIndex = 5
           TabVisible = False
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object laEvent: TLabel
             Left = 10
             Top = 5
@@ -1052,6 +1072,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
         object tsUser: TTabSheet
           ImageIndex = 3
           TabVisible = False
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object Label14: TLabel
             Left = 15
             Top = 60

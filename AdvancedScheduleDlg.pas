@@ -1,5 +1,5 @@
-(* Personal Backup
-   - Taskplaner-Interface (Erweiterte Einstellungen)
+(* Advanced settings for scheduled task - Demo
+   ===========================================
 
    © J. Rathlev, D.24222 Schwentinental (kontakt(a)rathlev-home.de))
 
@@ -12,8 +12,8 @@
    the specific language governing rights and limitations under the License.
    
    Vers. 1 - Nov. 2013
-   last updated: Feb. 2017
-   *)
+   last updated: August 2020
+*)
 
 unit AdvancedScheduleDlg;
 

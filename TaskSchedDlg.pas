@@ -1,4 +1,4 @@
-(* Edit schedule task - Demo
+(* Edit scheduled task - Demo
    =========================
 
    © J. Rathlev, D.24222 Schwentinental (kontakt(a)rathlev-home.de))

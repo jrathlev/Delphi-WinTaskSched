@@ -293,7 +293,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
       Height = 21
       Alignment = taRightJustify
       TabOrder = 5
-      Text = '0'
+      Text = '1'
     end
     object udMinutes: TUpDown
       Left = 199
@@ -304,6 +304,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
       Associate = edMinutes
       Min = 1
       Max = 24
+      Position = 1
       TabOrder = 6
     end
   end
