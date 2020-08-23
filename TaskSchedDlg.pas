@@ -797,7 +797,7 @@ begin
       end;
     end;
   if not ok then begin
-    MessageDlg(Format('The trigger mode "%s" is not supported by Personal Backup.'+sLineBreak
+    MessageDlg(Format('The trigger mode "%s" is not supported.'+sLineBreak
       +'Please use the Windows Task Scheduler for editing!',[st]),mtError,[mbOK],0);
     Result:=false; Exit;
     end;
