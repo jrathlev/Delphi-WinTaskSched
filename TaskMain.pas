@@ -90,7 +90,7 @@ begin
       Halt(1)
       end
     else begin
-      MessageDlg('Error initializing TWinTaskScheduler: '+IntToHex(hr,8),mtError,[mbOK],0);
+      MessageDlg('Error initializing TWinTaskSchedulerß: '+IntToHex(hr,8),mtError,[mbOK],0);
       Halt(2)
       end;
     end;
@@ -252,9 +252,11 @@ begin
       ok:=MessageDlg('Task already exists - edit?',mtConfirmation,mbYesNo,0)=mrYes;
       ok:=ok and TaskScheduleDialog.Execute(sn,TaskFolder.Tasks[n].Definition,user,pwd);
       end;
-    if ok then begin
-      n:=TaskFolder.RegisterTask(sn,td,User,pwd);
-      if n<0 then MessageDlg(TaskFolder.ErrorMessage,mtError,[mbOK],0)
+    if ok then with TaskFolder do begin
+      n:=RegisterTask(sn,td,User,pwd);
+      if n<0 then MessageDlg('Could not create scheduled task!'+sLineBreak
+        +SysErrorMessage(ResultCode(ErrorCode))+' - '+ErrorMessage,
+        mtError,[mbOK],0)
       else begin
         n:=GetListIndex(n);
         UpdateListView(n);
@@ -286,16 +288,9 @@ begin
     if TaskScheduleDialog.Execute(TaskName,Definition,user,pwd) then begin
       n:=RegisterTask(TaskName,Definition,user,pwd);
       if n<0 then begin   // Error
-        if (ResultCode(ErrorCode)>=ERROR_LOGON_FAILURE)
-            and (ResultCode(ErrorCode)<=ERROR_NONE_MAPPED) then begin
-          MessageDlg('Invalid user or password!'+sLineBreak+
-                      'Could not create or modify scheduled task!',
-                     mtError,[mbOK],0);
-          end
-        else begin
-          MessageDlg(SysErrorMessage(ErrorCode)+' - "'+ErrorMessage+'"',
-                     mtError,[mbOK],0);
-          end;
+        MessageDlg('Could not modify scheduled task!'+sLineBreak
+                   +SysErrorMessage(ResultCode(ErrorCode))+' - '+ErrorMessage,
+                   mtError,[mbOK],0);
         Refresh;
         end
       else begin
