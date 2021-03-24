@@ -90,7 +90,7 @@ begin
       Halt(1)
       end
     else begin
-      MessageDlg('Error initializing TWinTaskSchedulerß: '+IntToHex(hr,8),mtError,[mbOK],0);
+      MessageDlg('Error initializing TWinTaskScheduler: '+IntToHex(hr,8),mtError,[mbOK],0);
       Halt(2)
       end;
     end;

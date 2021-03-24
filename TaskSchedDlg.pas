@@ -4,6 +4,7 @@
    © J. Rathlev, D.24222 Schwentinental (kontakt(a)rathlev-home.de))
 
    The contents of this file may be used under the terms of the
+   Mozilla Public License ("MPL") or
    GNU Lesser General Public License Version 2 or later (the "LGPL")
 
    Software distributed under this License is distributed on an "AS IS" basis,
@@ -321,6 +322,7 @@ begin
     edUser.Enabled:=true;
     edPwd.Visible:=true;
     end;
+  laUser.Caption:=edUser.Text;
   end;
 
 procedure TTaskScheduleDialog.ShowPage;
@@ -771,6 +773,7 @@ begin
               ShowDelay(Delay>0);
               with laUser do begin
                 Caption:=LogonUserId; Visible:=true;
+                if length(Caption)=0 then Caption:=edUser.Text;
                 end;
               end
             else ok:=false;
@@ -803,7 +806,10 @@ begin
     end;
   Result:=ShowModal=mrOK;
   if Result then begin
+    AUsername:=edUser.Text;
+    APassword:=edPwd.Text;
     with ASchedTask do begin
+      UserId:=AUsername;
       Description:=leDesc.Text;
       if rbLoggedUser.Checked then LogonType:=ltToken else LogonType:=ltPassword;
       RunIfMissed:=AdvSet.ReRun;
@@ -910,8 +916,6 @@ begin
         end;
       Priority:=TThreadPriority(rgPriority.ItemIndex);
       end;
-    AUsername:=edUser.Text;
-    APassword:=edPwd.Text
     end
   end;
 
