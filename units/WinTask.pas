@@ -11,7 +11,7 @@
    the specific language governing rights and limitations under the License.
 
    Vers. 1.0 - Oct. 2017
-   last modified: Vers. 1.7 - August 2020
+   last modified: Vers. 1.8 - March 2021
    *)
 
 unit WinTask;
@@ -201,7 +201,7 @@ type
     constructor Create (Collection: TCollection);
     destructor Destroy; override;
     procedure SetTaskTrigger(const Value: ITrigger);
-    procedure SetToDefault;
+    procedure SetToDefault(const AUserId : string);
 //    property Repetition: IRepetitionPattern read GetRepetition write Set_Repetition;
     property Delay : cardinal read GetDelay write SetDelay;
     property DaysInterval : SmallInt read GetDaysInterval write SetDaysInterval;
@@ -448,8 +448,8 @@ var
      @rsTrgTypeMonthly,@rsTrgTypeIdle,@rsTrgTypeRegister,@rsTrgTypeStartup,
      @rsTrgTypeLogon,@rsTrgTypeStateChg,@rsTrgTypeCustom);
 
-  TaskWeeksOfMonthList : array[1..6] of pointer =
-    (@rsTrgFirst,@rsTrgSecond,@rsTrgThird,@rsTrgFourth,@rsTrgFifth,@rsTrgLast);
+  TaskWeeksOfMonthList : array[1..5] of pointer =
+    (@rsTrgFirst,@rsTrgSecond,@rsTrgThird,@rsTrgFourth,@rsTrgLast);
 
   CompatibilityNames : array[TWinTaskCompatibility] of pointer =
     (@rsCompAT,@rsXP,@rsVista,@rsWin7,@rsWin10);
@@ -565,7 +565,6 @@ begin
 function BoundaryToTimeInfo (Boundary : string) : TTimeInfo; overload;
 var
   y,m,d,h,n,s : integer;
-  minus : boolean;
 begin
   with Result do begin
     DateTime:=0; TimeZone:=false;
@@ -682,8 +681,18 @@ begin
 
 {------------------------------------------------------------------- }
 function TWinTaskExecAction.GetPath : string;
+
+  function DequotedCmdStr(const s : string; AQuote : Char) : string;
+  begin
+    Result:=AnsiDequotedStr(s,'"');
+    if (length(Result)=0) and (length(s)>2) and (s[1]=AQuote) and (s[length(s)]=AQuote) then begin
+      Result:=AnsiDequotedStr(AnsiQuotedStr(copy(s,2,length(s)-2),AQuote),AQuote);
+      end;
+    end;
+
 begin
-  Result:=AnsiDequotedStr((pAction as IExecAction).Path,'"');
+  Result:=DequotedCmdStr((pAction as IExecAction).Path,'"');
+//  Result:=AnsiDequotedStr((pAction as IExecAction).Path,'"');
   end;
 
 procedure TWinTaskExecAction.SetPath (Value : string);
@@ -851,9 +860,10 @@ begin
   inherited Destroy;
   end;
 
-procedure TWinTaskTrigger.SetToDefault;
+procedure TWinTaskTrigger.SetToDefault(const AUserId : string);
 begin
   StartTime:=Now;
+  SetLogonUserId(AUserId); // required for ttLogon
 //  EndTime:=Now+DaysInAYear(YearOf(Now));
 //  Interval:=SecsPerHour;
 //  Duration:=SecsPerDay;
@@ -939,13 +949,19 @@ begin
 
 function TWinTaskTrigger.GetWeeksOfMonth : integer;
 begin
-  if FTriggerType=ttMonthlyDow then Result:=IMonthlyDowTrigger(pTrigger).WeeksOfMonth
+  if FTriggerType=ttMonthlyDow then begin
+// Note: Get_WeeksOfMonth does not return $10 (16) for last week in month
+//       use Get_RunOnLastWeekOfMonth instead as workaround
+    Result:=IMonthlyDowTrigger(pTrigger).WeeksOfMonth ;
+    if RunOnLastWeekOfMonth then Result:=Result or $10;
+    end
   else Result:=0;
   end;
 
 procedure TWinTaskTrigger.SetWeeksOfMonth (Value : integer);
 begin
-  if (Value>0) and (Value<$40) and (FTriggerType=ttMonthlyDow) then
+  if (Value>0) and (Value<$20) and (FTriggerType=ttMonthlyDow) then
+// Note: Set_WeeksOfMonth can handle $10 (16) for last week in month
     IMonthlyDowTrigger(pTrigger).WeeksOfMonth:=Value;
   end;
 
@@ -998,8 +1014,6 @@ begin
   end;
 
 function TWinTaskTrigger.GetRandomDelay : cardinal;             // time in seconds
-var
-  st : string;
 begin
   case FTriggerType of
   ttTime   : Result:=TimeStringToSeconds(ITimeTrigger(pTrigger).RandomDelay);
@@ -1207,7 +1221,7 @@ var
     i : integer;
   begin
     Result:='';
-    for i:=1 to 6 do begin
+    for i:=1 to 5 do begin
       if Weeks and 1<>0 then begin
         if length(Result)>0 then Result:=Result+', ';
         Result:=Result+LoadResString(TaskWeeksOfMonthList[i]);
@@ -1290,7 +1304,7 @@ begin
         GetMonthList(MonthsOfYear),DateToStr(dd)])
       end;
   TASK_TRIGGER_MONTHLYDOW: with pTrigger as IMonthlyDOWTrigger do begin
-      Result:=TryFormat(rsTrgDMonthly,[WeeksOfMonthList(WeeksOfMonth),GetWeekdayList(DaysOfWeek),
+      Result:=TryFormat(rsTrgDMonthly,[WeeksOfMonthList(GetWeeksOfMonth),GetWeekdayList(DaysOfWeek),
         GetMonthList(MonthsOfYear),DateToStr(dd)])
       end;
   TASK_TRIGGER_IDLE: Result:=rsTrgIdle;
@@ -1636,7 +1650,7 @@ begin
 function TWinTask.NewTrigger (ATriggerType : TWinTaskTriggerType) : TWinTaskTrigger;
 begin
   Result:=FTriggers.New(ATriggerType);
-  Result.SetToDefault;
+  Result.SetToDefault(UserId);
   end;
 
 function TWinTask.DeleteTrigger (AIndex : integer) : boolean;
@@ -1809,7 +1823,6 @@ begin
 function TWinTaskFolder.Refresh : HResult;
 var
   i : integer;
-  pRegisteredTask : IRegisteredTask;
   ARegTask : TWinRegisteredTask;
 begin
   try
@@ -1854,7 +1867,6 @@ function TWinTaskFolder.RegisterTask (const TaskName : string; ATask : TWinTask;
                                       Username,Password : string) : integer;
 var
   pRegisteredTask : IRegisteredTask;
-  ARegTask : TWinRegisteredTask;
 begin
   Result:=-1; FErrMsg:=''; FErrorCode:=NO_ERROR;
   if ATask.LogonType=ltToken then begin
@@ -1904,8 +1916,6 @@ begin
 
 { $O-}     // does not work with optimization ??
 function TWinTaskScheduler.Init : HResult;
-var
-  ok : boolean;
 begin
   if succeeded(FResult) then begin
     //  Connect to the local task service.
