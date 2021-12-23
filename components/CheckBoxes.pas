@@ -13,6 +13,8 @@
 
   Vers. 1 - Apr. 2015
         2 - Jan. 2016
+        2.1 - December 2021 : CMShowingChanged added to init the procedure pointers
+   last modified: December 2021
 *)
 
 unit CheckBoxes;
@@ -33,13 +35,15 @@ type
     FDefListProc: Pointer;
     FListHandle: HWnd;
     FColorFocus, FColorNotFocus: TColor;
+    FCheckWidth,FCheckHeight,
     FDefaultIndex,
     FCheckedCount: integer;
     FOnCheckClick: TNotifyEvent;
     FFixedText,FHintPrefix : String;
+    procedure CMShowingChanged(var Message: TMessage); message CM_SHOWINGCHANGED;
     procedure CNDrawItem(var Message : TWMDrawItem); message CN_DRAWITEM;
     procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;
-    procedure ListWndProc(var Message : TMessage);
+    procedure ComboListWndProc(var Message : TMessage);
     procedure SetColorFocus(value : TColor);
     procedure SetColorNotFocus(value : TColor);
     procedure SetFixedText(Value : String);
@@ -62,6 +66,7 @@ type
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Init;
     procedure SetChecked(nIndex: integer; checked: boolean);
     function GetLongString(AIndex : integer): string;
     function AddChecked(value: string; checked: boolean): integer;
@@ -127,6 +132,8 @@ TCheckGroupBox = class(TGroupBox)
   private
     CheckBox : TCheckBox;
     FOnCheckClick: TNotifyEvent;
+    FCheckWidth,FCheckHeight,
+    CbIndent  : integer;
     function GetChecked : boolean;
     procedure SetChecked (Value : boolean);
   protected
@@ -146,7 +153,7 @@ procedure Register;
 
 implementation
 
-uses Vcl.Themes;
+uses Vcl.Forms, Vcl.Themes;
 
 // Define CompPalPage (see procedure "Register")
 {$INCLUDE UserComps.pas }
@@ -157,27 +164,14 @@ begin
   RegisterComponents(CompPalPage,[TCheckComboBox,TCheckGroupBox]);
   end;
 
-var
-  FCheckWidth,FCheckHeight: integer;
-
-procedure GetCheckSize;
-begin
-  with TBitmap.Create do
-    try
-      Handle:=LoadBitmap(0,PChar(32759));
-      FCheckWidth:=Width div 4;
-      FCheckHeight:=Height div 3;
-    finally
-      Free;
-    end;
-  end;
-
 constructor TCheckComboBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  Init;
+  FCheckWidth:=GetSystemMetrics(SM_CXMENUCHECK);
+  FCheckHeight:=FCheckWidth;
   ShowHint:=true;
   ParentShowHint:=false;
-  FListHandle:=0;
   FFixedText:=''; FHintPrefix:='';
   FDefaultIndex:=-1;
   Color:=clWindow;
@@ -185,7 +179,6 @@ begin
   FColorNotFocus:=clInfoBk;
   Style:=csOwnerDrawVariable;
   bCalcText:=true;
-  FListInstance:=MakeObjectInstance(ListWndProc);
 end;
 
 destructor TCheckComboBox.Destroy;
@@ -193,6 +186,13 @@ begin
   FreeObjectInstance(FListInstance);
   inherited Destroy;
 end;
+
+procedure TCheckComboBox.Init;
+begin
+  FListInstance:=MakeObjectInstance(ComboListWndProc);
+  FDefListProc:=nil;
+  FListHandle:=0;
+  end;
 
 procedure TCheckComboBox.ChangeScale(M, D: Integer);
 begin
@@ -384,6 +384,12 @@ begin
   if n=0 then Result:=s else Result:=copy(s,n+1,length(s));
   end;
 
+procedure TCheckComboBox.CMShowingChanged(var Message: TMessage);
+begin
+  inherited;
+  Init;
+  end;
+
 procedure TCheckComboBox.CNCommand(var Message: TWMCommand);
 begin
   case Message.NotifyCode of
@@ -449,7 +455,7 @@ begin             // 0 - No check, 1 - Empty check, 2 - Checked
   end;
 
 // DefWindowProc
-procedure TCheckComboBox.ListWndProc(var Message: TMessage);
+procedure TCheckComboBox.ComboListWndProc(var Message: TMessage);
 var
   nItemHeight,nTopIndex,nIndex : integer;
   rcItem,rcClient : TRect;
@@ -465,7 +471,7 @@ begin
       begin
         if (TWMKey(Message).CharCode = VK_SPACE) then begin
           // Get the current selection
-          nIndex:=CallWindowProcA(FDefListProc,FListHandle,LB_GETCURSEL,
+          nIndex:=CallWindowProc(FDefListProc,FListHandle,LB_GETCURSEL,
             Message.wParam,Message.lParam);
           SendMessage(FListHandle,LB_GETITEMRECT,nIndex,LongInt(@rcItem));
           InvalidateRect(FListHandle,@rcItem,false);
@@ -499,33 +505,36 @@ begin
         exit;
       end;
   end;
-  ComboWndProc(Message,FListHandle,FDefListProc);
+  Message.Result := CallWindowProc(FDefListProc, FListHandle, Message.Msg, Message.wParam, Message.lParam);
+//  ComboWndProc(Message,FListHandle,FDefListProc);
 end;
 
 procedure TCheckComboBox.WndProc(var Message: TMessage);
 var
   lWnd: HWnd;
 begin
-  if message.Msg = WM_CTLCOLORLISTBOX then
-  begin
+  inherited WndProc(Message);
+  if message.Msg = WM_CTLCOLORLISTBOX then begin
     // If the listbox hasn't been subclassed yet, do so...
     if (FListHandle = 0) then begin
       lWnd:=message.lParam;
       if (lWnd <> 0) and (lWnd <> FDropHandle) then begin
         // Save the listbox handle
         FListHandle:=lWnd;
-        FDefListProc:=Pointer(GetWindowLong(FListHandle,GWL_WNDPROC));
-        SetWindowLong(FListHandle,GWL_WNDPROC,LongInt(FListInstance));
+        FDefListProc:=Pointer(GetWindowLongPtr(FListHandle,GWL_WNDPROC));
+        SetWindowLongPtr(FListHandle,GWL_WNDPROC,LongInt(FListInstance));
         end;
       end;
-    end;
-  inherited;
+    end
   end;
 
 { ------------------------------------------------------------------- }
 constructor TCheckGroupBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FCheckWidth:=GetSystemMetrics(SM_CXMENUCHECK);
+  FCheckHeight:=FCheckWidth;
+  CbIndent:=MulDiv(FCheckWidth,35,20); //MulDiv(27,PixelsPerInchOnDesign,GetParentForm(TControl(AOwner)).Monitor.PixelsPerInch);
   CheckBox:=TCheckBox.Create(self);
   CheckBox.Parent:=self;
   with CheckBox do begin
@@ -545,9 +554,6 @@ begin
   inherited AfterConstruction;
   Checked:=CheckBox.Checked;
   end;
-
-const
-  CbIndent = 27;
 
 function TCheckGroupBox.GetChecked : boolean;
 begin
@@ -655,8 +661,5 @@ begin
     end;
   end;
 end;
-
-initialization
-GetCheckSize;
 
 end.
