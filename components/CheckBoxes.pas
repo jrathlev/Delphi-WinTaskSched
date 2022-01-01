@@ -2,7 +2,7 @@
    =====================================
   derived from ATCheckedComboBox.pas (unknown author)
 
-  © Dr. J. Rathlev, D-24222 Schwentinental (kontakt(a)rathlev-home.de)
+  Â© Dr. J. Rathlev, D-24222 Schwentinental (kontakt(a)rathlev-home.de)
 
   The contents of this file may be used under the terms of the
   GNU Lesser General Public License Version 2 or later (the "LGPL")
@@ -387,7 +387,7 @@ begin
 procedure TCheckComboBox.CMShowingChanged(var Message: TMessage);
 begin
   inherited;
-  Init;
+//  Init;
   end;
 
 procedure TCheckComboBox.CNCommand(var Message: TWMCommand);
