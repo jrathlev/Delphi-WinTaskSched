@@ -2,7 +2,7 @@
    =====================================
   derived from ATCheckedComboBox.pas (unknown author)
 
-  Â© Dr. J. Rathlev, D-24222 Schwentinental (kontakt(a)rathlev-home.de)
+  © Dr. J. Rathlev, D-24222 Schwentinental (kontakt(a)rathlev-home.de)
 
   The contents of this file may be used under the terms of the
   GNU Lesser General Public License Version 2 or later (the "LGPL")
@@ -13,7 +13,8 @@
 
   Vers. 1 - Apr. 2015
         2 - Jan. 2016
-        2.1 - December 2021 : CMShowingChanged added to init the procedure pointers
+        2.1 - December 2021 : procedure Init added to initialize the procedure pointers
+                              from calling unit
    last modified: December 2021
 *)
 
