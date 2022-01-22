@@ -155,6 +155,7 @@ type
     procedure SyncTimes(Sender: TObject);
     procedure cbMondayClick(Sender: TObject);
     procedure cbJanClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     AdvSet : TAdvancedSettings;
@@ -248,6 +249,13 @@ begin
 procedure TTaskScheduleDialog.FormDestroy(Sender: TObject);
 begin
 //
+  end;
+
+procedure TTaskScheduleDialog.FormShow(Sender: TObject);
+begin
+  ccMonthDays.Init;
+  ccMonthStart.Init;
+  ccWeekdays.Init;
   end;
 
 procedure TTaskScheduleDialog.ShowRandom (AShow : boolean);
@@ -365,6 +373,7 @@ begin
       with edPwd do if Visible then SetFocus;
       end
     else begin
+      laUser.Caption:=edUser.Text;
       ModalResult:=mrOK;
       end;
     end;

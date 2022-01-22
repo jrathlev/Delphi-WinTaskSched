@@ -113,7 +113,18 @@ begin
   end;
 
 procedure TMainForm.FormShow(Sender: TObject);
+var
+  n  : integer;
+const
+  NewFolder = 'Test';
 begin
+  if MessageDlg('Create new folder "Test"?',mtConfirmation,mbYesNo,0)=mrYes then
+      with WinTasks,TaskFolder do begin
+    n:=IndexOfFolder(NewFolder);
+    if n<0 then n:=CreateFolder(NewFolder);
+    if n>=0 then Folder:=Folders[n].Path
+    else MessageDlg('Error on creating folder',mtError,[mbOK],0)
+    end;
   UpdateListView(0);
   end;
 
@@ -139,7 +150,7 @@ begin
     if AINdex>=Items.Count then AIndex:=Items.Count-1;
     ItemIndex:=AIndex;
     Invalidate;
-    Selected.MakeVisible(false);
+    if ItemIndex>=0 then Selected.MakeVisible(false);
     end;
   end;
 
@@ -238,7 +249,7 @@ var
 begin
   User:=''; pwd:=''; sn:='';
   if InputQuery('Create new Task?','Name of task:',sn) then with WinTasks do begin
-    n:=TaskFolder.IndexOf(sn);
+    n:=TaskFolder.IndexOfTask(sn);
     if n<0 then begin
       td:=NewTask;
       with td do begin
@@ -309,7 +320,7 @@ begin
   if SelectedTaskIndex>=0 then with WinTasks.TaskFolder do begin
     sn:=Tasks[SelectedTaskIndex].TaskName;
     if MessageDlg(Format('Delete task "%s"?',[sn]),mtConfirmation,mbYesNo,0)=mrYes then begin
-      if failed(DeleteTask(sn)) then MessageDlg(ErrorMessage,mtError,[mbOK],0)
+      if not DeleteTask(sn) then MessageDlg(ErrorMessage,mtError,[mbOK],0)
       else UpdateListView(GetListIndex(SelectedTaskIndex));
       end;
     end;
