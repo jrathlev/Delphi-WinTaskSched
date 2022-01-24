@@ -7,7 +7,7 @@ accounts without passwords. The *Windows API* provides several new functions to
 integrate the Task Scheduler with user programs. To make this easier to the 
 Delphi programmer, I developed several units which encapsulate the functions 
 the *Windows Task Scheduler 2.0* into Delphi objects. To demonstrate the 
-integration of these objects into own code, a sample program (new in August 2020) 
+integration of these objects into own code, a sample program (new in January 2022) 
 is included to the package.
 
 **Note:** The implementation is not complete. But all functions to create and edit time schedules for user applications are available.
