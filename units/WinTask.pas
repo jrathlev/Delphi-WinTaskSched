@@ -1886,10 +1886,13 @@ begin
       ATaskFolder:=TWinTaskSubfolder.Create(pTaskFolderCollection.Item[i]);
       FFolders.Add(ATaskFolder);
       end;
-    Result:=ERROR_SUCCESS;
+    FErrorCode:=ERROR_SUCCESS;
   except
-    on E:EOleSysError do Result:=E.ErrorCode;
+    on E:EOleSysError do with E do begin
+      FErrMsg:=Message; FErrorCode:= ErrorCode;
+      end;
     end;
+  Result:=FErrorCode;
   end;
 
 function TWinTaskFolder.IndexOfFolder (const FolderName: String): integer;
@@ -1904,14 +1907,13 @@ begin
   FErrMsg:=''; FErrorCode:=ERROR_SUCCESS;
   try
     pRootFolder.CreateFolder(AName,'');
-    Refresh;
-    Result:=IndexOfFolder(AName);
+    if succeeded(Refresh) then Result:=IndexOfFolder(AName)
+    else Result:=-1;
   except
     on E:EOleSysError do with E do begin
-      FErrMsg:=Message; FErrorCode:= ErrorCode;
+      FErrMsg:=Message; FErrorCode:= ErrorCode; Result:=-1;
       end;
     end;
-  if FErrorCode<>ERROR_SUCCESS then Result:=-1;
   end;
 
 function TWinTaskFolder.DeleteFolder (const AName : string) : boolean;
@@ -1919,13 +1921,12 @@ begin
   FErrMsg:=''; FErrorCode:=ERROR_SUCCESS;
   try
     pRootFolder.DeleteFolder(AName,0);
-    Refresh;
+    Result:=succeeded(Refresh);
   except
     on E:EOleSysError do with E do begin
-      FErrMsg:=Message; FErrorCode:= ErrorCode;
+      FErrMsg:=Message; FErrorCode:= ErrorCode; Result:=false;
       end;
     end;
-  Result:=FErrorCode=ERROR_SUCCESS;
   end;
 
 function TWinTaskFolder.IndexOfTask(const TaskName: string): integer;
@@ -1940,13 +1941,12 @@ begin
   FErrMsg:=''; FErrorCode:=ERROR_SUCCESS;
   try
     pRootFolder.DeleteTask(TaskName,0);
-    Refresh;
+    Result:=succeeded(Refresh);
   except
     on E:EOleSysError do with E do begin
-      FErrMsg:=Message; FErrorCode:= ErrorCode;
+      FErrMsg:=Message; FErrorCode:= ErrorCode; Result:=false;
       end;
     end;
-  Result:=FErrorCode=ERROR_SUCCESS;
   end;
 
 // Result >=0: Index of new task
