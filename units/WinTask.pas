@@ -13,7 +13,7 @@
    Vers. 1.0 - Oct. 2017
    Vers. 1.6 - September 2019
    Vers. 2.0 - January 2022
-   last modified: January 2022
+   last modified: March 2022
    *)
 
 unit WinTask;
@@ -399,6 +399,8 @@ type
     FFolders : TWinTaskFolderList;
     FErrMsg : string;
     FErrorCode : cardinal;
+    function GetName : string;
+    function GetPath : string;
     function GetTask(Index : Integer): TWinRegisteredTask;
     function GetFolder(Index : Integer): TWinTaskSubfolder;
   public
@@ -414,6 +416,8 @@ type
     function DeleteFolder (const AName : string) : boolean;
     property ErrorCode : cardinal read FErrorCode;
     property ErrorMessage : string read FErrMsg;
+    property FolderName : string read GetName;
+    property FolderPath : string read GetPath;
     property Folders[Index: Integer] : TWinTaskSubfolder read GetFolder;
     property FolderCount : integer read FNumFolders;
     property NumberOfTasks : integer read FNumTasks;
@@ -436,7 +440,7 @@ type
     function Init : HResult;
     function Refresh : HResult;
     function NewTask : TWinTask;
-    property Folder : string read FFolder write SetFolder;
+    property Path : string read FFolder write SetFolder;
     property TaskFolder : TWinTaskFolder read FTaskFolder;
   public
     class function IsRunning: Boolean;
@@ -1850,6 +1854,17 @@ begin
   pTaskCollection:=nil;
   pRootFolder:=nil;
   inherited Destroy;
+  end;
+
+function TWinTaskFolder.GetName : string;
+begin
+  Result:=pRootFolder.Name;
+  if Result='\' then Result:='';
+  end;
+
+function TWinTaskFolder.GetPath : string;
+begin
+  Result:=pRootFolder.Path;
   end;
 
 function TWinTaskFolder.GetTask (Index : Integer) : TWinRegisteredTask;
