@@ -612,9 +612,9 @@ object MainForm: TMainForm
   end
   object lvTasks: TListView
     Left = 0
-    Top = 0
+    Top = 21
     Width = 731
-    Height = 200
+    Height = 179
     Align = alClient
     BevelInner = bvNone
     BevelOuter = bvNone
@@ -644,6 +644,17 @@ object MainForm: TMainForm
     ViewStyle = vsReport
     OnDblClick = btbEditClick
     OnSelectItem = lvTasksSelectItem
+    ExplicitTop = 75
+    ExplicitHeight = 125
+  end
+  object paTop: TPanel
+    Left = 0
+    Top = 0
+    Width = 731
+    Height = 21
+    Align = alTop
+    Alignment = taLeftJustify
+    TabOrder = 2
   end
   object Timer: TTimer
     Interval = 10000
