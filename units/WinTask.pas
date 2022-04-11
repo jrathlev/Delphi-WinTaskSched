@@ -13,7 +13,7 @@
    Vers. 1.0 - Oct. 2017
    Vers. 1.6 - September 2019
    Vers. 2.0 - January 2022
-   last modified: March 2022
+   last modified: April 2022
    *)
 
 unit WinTask;
@@ -570,9 +570,9 @@ const
 begin
   if length(sTime)>0 then begin
     n:=1;
-    while not (sTime[n] in Numbers) do inc(n);
+    while (n<=length(sTime)) and not (sTime[n] in Numbers) do inc(n);
     k:=n;
-    while sTime[k] in Numbers do inc(k);
+    while (k<=length(sTime)) and (sTime[k] in Numbers) do inc(k);
     if TryStrToInt(copy(sTime,n,k-n),v) then Result:=v
     else Result:=0;
     Delete(sTime,1,k-1);
@@ -586,7 +586,7 @@ begin
   end;
 
 // Convert boundary string to TDateTime
-function BoundaryToTimeInfo (Boundary : string) : TTimeInfo; overload;
+function BoundaryToTimeInfo (Boundary : string) : TTimeInfo;
 var
   y,m,d,h,n,s : integer;
 begin
@@ -623,7 +623,7 @@ begin
     end;
   end;
 
-function BoundaryToDateTime (Boundary : string) : TDateTime;  overload;
+function BoundaryToDateTime (const Boundary : string) : TDateTime;
 begin
   Result:=BoundaryToTimeInfo(Boundary).DateTime;
   end;
