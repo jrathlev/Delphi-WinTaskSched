@@ -566,13 +566,13 @@ function ReadNextValue (var sTime : string) : word;
 var
   n,k,v : integer;
 const
-  Numbers = ['0'..'9'];
+  Numbers : TSysCharSet = ['0'..'9'];
 begin
   if length(sTime)>0 then begin
     n:=1;
-    while (n<=length(sTime)) and not (sTime[n] in Numbers) do inc(n);
+    while (n<=length(sTime)) and not CharInSet(sTime[n],Numbers) do inc(n);
     k:=n;
-    while (k<=length(sTime)) and (sTime[k] in Numbers) do inc(k);
+    while (k<=length(sTime)) and CharInSet(sTime[k],Numbers) do inc(k);
     if TryStrToInt(copy(sTime,n,k-n),v) then Result:=v
     else Result:=0;
     Delete(sTime,1,k-1);
