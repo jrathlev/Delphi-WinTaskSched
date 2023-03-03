@@ -261,9 +261,9 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
       object Label3: TLabel
         Left = 184
         Top = 8
-        Width = 37
+        Width = 45
         Height = 13
-        Caption = 'minutes'
+        Caption = 'minute(s)'
       end
       object udMinutes: TUpDown
         Left = 130
