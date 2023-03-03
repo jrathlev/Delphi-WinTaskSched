@@ -3,7 +3,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   Top = 341
   BorderStyle = bsDialog
   Caption = 'Advanced Schedule Options'
-  ClientHeight = 291
+  ClientHeight = 354
   ClientWidth = 325
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,12 +16,12 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   OnCreate = FormCreate
   DesignSize = (
     325
-    291)
+    354)
   PixelsPerInch = 96
   TextHeight = 13
   object OKBtn: TBitBtn
     Left = 143
-    Top = 256
+    Top = 319
     Width = 71
     Height = 31
     Anchors = [akRight, akBottom]
@@ -81,11 +81,11 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     ModalResult = 1
     NumGlyphs = 2
     TabOrder = 0
-    ExplicitTop = 260
+    ExplicitTop = 256
   end
   object CancelBtn: TBitBtn
     Left = 218
-    Top = 256
+    Top = 319
     Width = 101
     Height = 31
     Anchors = [akRight, akBottom]
@@ -145,7 +145,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     ModalResult = 2
     NumGlyphs = 2
     TabOrder = 1
-    ExplicitTop = 260
+    ExplicitTop = 256
   end
   object paEnd: TPanel
     Left = 0
@@ -190,31 +190,10 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     Left = 0
     Top = 66
     Width = 325
-    Height = 76
+    Height = 95
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 3
-    object Label1: TLabel
-      Left = 25
-      Top = 48
-      Width = 44
-      Height = 13
-      Caption = 'duration:'
-    end
-    object Label2: TLabel
-      Left = 145
-      Top = 48
-      Width = 35
-      Height = 13
-      Caption = 'hour(s)'
-    end
-    object Label3: TLabel
-      Left = 250
-      Top = 48
-      Width = 37
-      Height = 13
-      Caption = 'minutes'
-    end
     object Label8: TLabel
       Left = 25
       Top = 13
@@ -257,47 +236,75 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
       Position = 1
       TabOrder = 2
     end
-    object edHours: TEdit
-      Left = 110
+    object cbDuration: TCheckBox
+      Left = 25
       Top = 45
-      Width = 31
-      Height = 21
-      Alignment = taRightJustify
+      Width = 221
+      Height = 17
+      Caption = 'Duration:'
       TabOrder = 3
-      Text = '1'
     end
-    object udHours: TUpDown
-      Left = 94
-      Top = 45
-      Width = 16
-      Height = 21
-      AlignButton = udLeft
-      Associate = edHours
-      Min = 1
-      Max = 24
-      Position = 1
+    object paDuration: TPanel
+      Left = 75
+      Top = 65
+      Width = 246
+      Height = 31
+      BevelOuter = bvNone
       TabOrder = 4
-    end
-    object edMinutes: TEdit
-      Left = 215
-      Top = 45
-      Width = 31
-      Height = 21
-      Alignment = taRightJustify
-      TabOrder = 5
-      Text = '1'
-    end
-    object udMinutes: TUpDown
-      Left = 199
-      Top = 45
-      Width = 16
-      Height = 21
-      AlignButton = udLeft
-      Associate = edMinutes
-      Min = 1
-      Max = 24
-      Position = 1
-      TabOrder = 6
+      object Label2: TLabel
+        Left = 75
+        Top = 8
+        Width = 35
+        Height = 13
+        Caption = 'hour(s)'
+      end
+      object Label3: TLabel
+        Left = 184
+        Top = 8
+        Width = 37
+        Height = 13
+        Caption = 'minutes'
+      end
+      object udMinutes: TUpDown
+        Left = 130
+        Top = 5
+        Width = 16
+        Height = 21
+        AlignButton = udLeft
+        Associate = edMinutes
+        Max = 60
+        Position = 1
+        TabOrder = 0
+      end
+      object edHours: TEdit
+        Left = 35
+        Top = 5
+        Width = 31
+        Height = 21
+        Alignment = taRightJustify
+        TabOrder = 1
+        Text = '1'
+      end
+      object udHours: TUpDown
+        Left = 19
+        Top = 5
+        Width = 16
+        Height = 21
+        AlignButton = udLeft
+        Associate = edHours
+        Max = 24
+        Position = 1
+        TabOrder = 2
+      end
+      object edMinutes: TEdit
+        Left = 145
+        Top = 5
+        Width = 31
+        Height = 21
+        Alignment = taRightJustify
+        TabOrder = 3
+        Text = '1'
+      end
     end
   end
   object paRepHeader: TPanel
@@ -320,12 +327,13 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   end
   object paLimit: TPanel
     Left = 0
-    Top = 142
+    Top = 161
     Width = 325
     Height = 71
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 5
+    ExplicitTop = 142
     object cbLimitUnit: TComboBox
       Left = 155
       Top = 35
@@ -374,12 +382,13 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   end
   object paReRun: TPanel
     Left = 0
-    Top = 213
+    Top = 232
     Width = 325
     Height = 36
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 6
+    ExplicitTop = 213
     object cbReRun: TCheckBox
       Left = 15
       Top = 5

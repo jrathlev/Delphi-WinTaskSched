@@ -562,7 +562,7 @@ begin
   udDays.Position:=2;
   edDays.Enabled:=false; udDays.Enabled:=false; laDays.Enabled:=false;
   with AdvSet do begin
-    UseEndDate:=false; UseLimit:=false; ReRun:=false;
+    UseEndDate:=false; RepeatTask:=false; UseLimit:=false; ReRun:=false; StopEndDuration:=false;
     MinutesInterval:=60; MinutesDuration:=1440; MinutesLimit:=4320;
     EndDate:=ADateTime;
     end;
@@ -713,10 +713,11 @@ begin
           UseEndDate:=EndTime>Now;
           if UseEndDate then EndDate:=DateOf(EndTime+1)-OneSecond
           else EndDate:=Date+366-OneSecond;
-          RepeatTask:=Duration>0;
+          RepeatTask:=Interval>0;
+          StopEndDuration:=StopAtDurationEnd;
           if RepeatTask then begin
-            MinutesDuration:=Duration div 60;
             MinutesInterval:=Interval div 60;
+            if StopEndDuration then MinutesDuration:=Duration div 60;
             end;
           UseLimit:=ExecutionTimeLimit>0;
           if UseLimit then MinutesLimit:=ExecutionTimeLimit div 60;
@@ -853,9 +854,9 @@ begin
             if EndTime<=StartTime then EndTime:=StartTime+OneMinute else EndTime:=EndDate
             end
           else EndTime:=0;
+          StopAtDurationEnd:=StopEndDuration;
           if RepeatTask then begin
             Duration:=MinutesDuration*60; Interval:=MinutesInterval*60;
-            if Duration<=Interval then Duration:=Interval+1;
             end
           else begin
             Duration:=0; Interval:=0;

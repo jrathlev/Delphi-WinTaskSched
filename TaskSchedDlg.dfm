@@ -30,6 +30,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
     TabOrder = 1
     object tsProgram: TTabSheet
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object edWorkDir: TLabeledEdit
         Left = 5
         Top = 110
@@ -181,6 +185,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
         TabOrder = 2
         object tsDaily: TTabSheet
           TabVisible = False
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object Label1: TLabel
             Left = 15
             Top = 25
@@ -385,6 +393,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
           ParentShowHint = False
           ShowHint = False
           TabVisible = False
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object Label4: TLabel
             Left = 15
             Top = 25
@@ -645,6 +657,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
         object tsMonthly: TTabSheet
           ImageIndex = 2
           TabVisible = False
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object laMonth: TLabel
             Left = 10
             Top = 5
@@ -1202,6 +1218,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
         object tsEvent: TTabSheet
           ImageIndex = 5
           TabVisible = False
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object laEvent: TLabel
             Left = 10
             Top = 5
@@ -1399,6 +1419,10 @@ object TaskScheduleDialog: TTaskScheduleDialog
         object tsUser: TTabSheet
           ImageIndex = 3
           TabVisible = False
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object Label14: TLabel
             Left = 15
             Top = 60

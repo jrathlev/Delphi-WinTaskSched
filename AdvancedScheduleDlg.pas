@@ -26,6 +26,7 @@ type
   TAdvancedSettings = record
     UseEndDate,
     RepeatTask,
+    StopEndDuration,
     UseLimit,
     ReRun      : boolean;
     EndDate    : TDateTime;
@@ -40,7 +41,6 @@ type
     cbExpire: TCheckBox;
     dpExpire: TDateTimePicker;
     Label8: TLabel;
-    Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     cbLimit: TCheckBox;
@@ -62,6 +62,8 @@ type
     udMinutes: TUpDown;
     udLimit: TUpDown;
     edLimit: TEdit;
+    cbDuration: TCheckBox;
+    paDuration: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure cbExpireClick(Sender: TObject);
     procedure cbRepUnitCloseUp(Sender: TObject);
@@ -71,7 +73,7 @@ type
   private
     { Private declarations }
     LastExpUnit : integer;
-    procedure ShowRepeat (AShow : boolean);
+    procedure ShowRepeat (ARepeat,ADuration : boolean);
     procedure ShowLimit (AShow : boolean);
   public
     { Public declarations }
@@ -99,11 +101,15 @@ begin
   end;
 
 { ---------------------------------------------------------------- }
-procedure TAdvancedScheduleDialog.ShowRepeat (AShow : boolean);
+procedure TAdvancedScheduleDialog.ShowRepeat (ARepeat,ADuration : boolean);
 var
   i : integer;
 begin
-  with paRepeat do for i:=0 to ControlCount-1 do Controls[i].Enabled:=AShow;
+  with paRepeat do for i:=0 to ControlCount-1 do Controls[i].Enabled:=ARepeat;
+  if ARepeat then begin
+    cbDuration.Checked:=ADuration;
+    with paDuration do for i:=0 to ControlCount-1 do Controls[i].Enabled:=ADuration;
+    end;
   end;
 
 procedure TAdvancedScheduleDialog.ShowLimit (AShow : boolean);
@@ -127,7 +133,7 @@ begin
 
 procedure TAdvancedScheduleDialog.cbRepeatClick(Sender: TObject);
 begin
-  ShowRepeat(cbRepeat.Checked);
+  ShowRepeat(cbRepeat.Checked,cbDuration.Checked);
   end;
 
 procedure TAdvancedScheduleDialog.cbRepUnitCloseUp(Sender: TObject);
@@ -173,7 +179,7 @@ begin
       dpExpire.Date:=Date+DaysInAYear(YearOf(Now));dtExpire.Time:=0.5;
       end;
     cbRepeat.Checked:=RepeatTask;
-    ShowRepeat(RepeatTask);
+    ShowRepeat(RepeatTask,StopEndDuration);
     if MinutesInterval mod 60 =0 then begin
       cbRepUnit.ItemIndex:=0;
       with udInterval do begin       // hours
@@ -222,8 +228,12 @@ begin
     if cbRepUnit.ItemIndex=0 then MinutesInterval:=udInterval.Position*60
     else MinutesInterval:=udInterval.Position;
     RepeatTask:=cbRepeat.Checked;
-    MinutesDuration:=60*udHours.Position+udMinutes.Position;
-    if MinutesInterval>=MinutesDuration then MinutesDuration:=MinutesInterval+1;
+    StopEndDuration:=cbDuration.Checked;
+    if not StopEndDuration then MinutesDuration:=0
+    else begin
+      MinutesDuration:=60*udHours.Position+udMinutes.Position;
+      if (MinutesInterval>=MinutesDuration) then MinutesDuration:=MinutesInterval+1;
+      end;
     if cbLimitUnit.ItemIndex=0 then MinutesLimit:=udLimit.Position*1440
     else if cbLimitUnit.ItemIndex=1 then MinutesLimit:=udLimit.Position*60
     else MinutesLimit:=udLimit.Position;
