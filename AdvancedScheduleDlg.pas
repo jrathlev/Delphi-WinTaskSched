@@ -12,7 +12,7 @@
    the specific language governing rights and limitations under the License.
    
    Vers. 1 - Nov. 2013
-   last updated: August 2020
+   last updated: March 2023
 *)
 
 unit AdvancedScheduleDlg;
