@@ -3,7 +3,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   Top = 341
   BorderStyle = bsDialog
   Caption = 'Advanced Schedule Options'
-  ClientHeight = 354
+  ClientHeight = 311
   ClientWidth = 325
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,12 +16,12 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   OnCreate = FormCreate
   DesignSize = (
     325
-    354)
+    311)
   PixelsPerInch = 96
   TextHeight = 13
   object OKBtn: TBitBtn
     Left = 143
-    Top = 319
+    Top = 276
     Width = 71
     Height = 31
     Anchors = [akRight, akBottom]
@@ -81,11 +81,11 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     ModalResult = 1
     NumGlyphs = 2
     TabOrder = 0
-    ExplicitTop = 256
+    ExplicitTop = 319
   end
   object CancelBtn: TBitBtn
     Left = 218
-    Top = 319
+    Top = 276
     Width = 101
     Height = 31
     Anchors = [akRight, akBottom]
@@ -145,7 +145,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     ModalResult = 2
     NumGlyphs = 2
     TabOrder = 1
-    ExplicitTop = 256
+    ExplicitTop = 319
   end
   object paEnd: TPanel
     Left = 0
@@ -266,7 +266,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
         Caption = 'minute(s)'
       end
       object udMinutes: TUpDown
-        Left = 130
+        Left = 129
         Top = 5
         Width = 16
         Height = 21
@@ -333,7 +333,6 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 5
-    ExplicitTop = 142
     object cbLimitUnit: TComboBox
       Left = 155
       Top = 35
@@ -388,7 +387,6 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 6
-    ExplicitTop = 213
     object cbReRun: TCheckBox
       Left = 15
       Top = 5
