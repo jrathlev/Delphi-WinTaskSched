@@ -13,7 +13,8 @@
    Vers. 1.0 - Oct. 2017
    Vers. 1.6 - September 2019
    Vers. 2.0 - January 2022
-   last modified: April 2022
+   Vers. 2.1 - March 2023 -  Repetition trigger fixed
+   last modified: March 2023
    *)
 
 unit WinTask;
@@ -174,6 +175,8 @@ type
     procedure SetDaysInterval (Value : SmallInt);
     function GetDelay : cardinal;               // time in seconds
     procedure SetDelay (Value : cardinal);
+    function GetStopAtDurationEnd : boolean;
+    procedure SetStopAtDurationEnd (Value : boolean);
     function GetDuration : cardinal;            // time in seconds
     procedure SetDuration (Value : cardinal);
     function GetExecutionTimeLimit : cardinal;  // time in seconds
@@ -192,8 +195,6 @@ type
     procedure SetRandomDelay (Value : cardinal);
     function GetStartTime : TDateTime;
     procedure SetStartTime (Value : TDateTime);
-    function GetStopAtDurationEnd : boolean;
-    procedure SetStopAtDurationEnd (Value : boolean);
     function GetSubscription : string;
     procedure SetSubscription (const Value : string);
     function GetTriggerType : TWinTaskTriggerType;
@@ -209,6 +210,7 @@ type
     property DaysInterval : SmallInt read GetDaysInterval write SetDaysInterval;
     property DaysOfMonth : integer read GetDaysOfMonth write SetDaysOfMonth;
     property DaysOfWeek : integer read GetDaysOfWeek write SetDaysOfWeek;
+    property StopAtDurationEnd : boolean read GetStopAtDurationEnd write SetStopAtDurationEnd;
     property Duration : cardinal read GetDuration write SetDuration;
     property ExecutionTimeLimit : cardinal read GetExecutionTimeLimit write SetExecutionTimeLimit;
     property EndTime : TDateTime read GetEndTime write SetEndTime;
@@ -221,7 +223,6 @@ type
     property RunOnLastDayOfMonth : boolean read GetRunOnLastDayOfMonth write SetRunOnLastDayOfMonth;
     property RunOnLastWeekOfMonth : boolean read GetRunOnLastWeekOfMonth write SetRunOnLastWeekOfMonth;
     property StartTime : TDateTime read GetStartTime write SetStartTime;
-    property StopAtDurationEnd : boolean read GetStopAtDurationEnd write SetStopAtDurationEnd;
     property Subscription : string  read GetSubscription write SetSubscription;
     property TaskTrigger : ITrigger read pTrigger;
     property TriggerType : TWinTaskTriggerType read GetTriggerType;
@@ -1096,6 +1097,16 @@ begin
     end;
   end;
 
+function TWinTaskTrigger.GetStopAtDurationEnd : boolean;
+begin
+  Result:=pTrigger.Repetition.StopAtDurationEnd;
+  end;
+
+procedure TWinTaskTrigger.SetStopAtDurationEnd (Value : boolean);
+begin
+  pTrigger.Repetition.StopAtDurationEnd:=Value;
+  end;
+
 function TWinTaskTrigger.GetDuration : cardinal;            // time in seconds
 begin
   Result:=TimeStringToSeconds(pTrigger.Repetition.Duration);
@@ -1114,16 +1125,6 @@ begin
 procedure TWinTaskTrigger.SetInterval(Value : cardinal);
 begin
   pTrigger.Repetition.Interval:=SecondsToTimeString(Value);
-  end;
-
-function TWinTaskTrigger.GetStopAtDurationEnd : boolean;
-begin
-  Result:=pTrigger.Repetition.StopAtDurationEnd;
-  end;
-
-procedure TWinTaskTrigger.SetStopAtDurationEnd (Value : boolean);
-begin
-  pTrigger.Repetition.StopAtDurationEnd:=Value;
   end;
 
 function TWinTaskTrigger.GetExecutionTimeLimit : cardinal;  // time in seconds
