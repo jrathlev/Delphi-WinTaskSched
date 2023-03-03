@@ -15,7 +15,7 @@
         2 - Jan. 2016
         2.1 - December 2021 : procedure Init added to initialize the procedure pointers
                               from calling unit
-   last modified: December 2021
+   last modified: September 2022
 *)
 
 unit CheckBoxes;
@@ -129,7 +129,7 @@ type
     property OnStartDrag;
   end;
 
-TCheckGroupBox = class(TGroupBox)
+  TCheckGroupBox = class(TCustomGroupBox)
   private
     CheckBox : TCheckBox;
     FOnCheckClick: TNotifyEvent;
@@ -137,17 +137,72 @@ TCheckGroupBox = class(TGroupBox)
     CbIndent  : integer;
     function GetChecked : boolean;
     procedure SetChecked (Value : boolean);
+    function GetText : TCaption;
+    procedure SetText(const Value: TCaption);
   protected
     procedure Paint; override;
     procedure CheckClick(Sender: TObject);
     procedure AfterConstruction; override;
-    procedure Invalidate; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Invalidate; override;
   published
+    property Align;
+    property Anchors;
+    property BiDiMode;
+    property Caption: TCaption read GetText write SetText;
     property Checked : boolean read GetChecked write SetChecked default false;
+    property Color;
+    property Constraints;
+    property Ctl3D;
+    property DockSite;
+    property DoubleBuffered;
+    property DragCursor;
+    property DragKind;
+    property DragMode;
+    property Enabled;
+    property Font;
+    property Padding;
+    property ParentBackground default True;
+    property ParentBiDiMode;
+    property ParentColor;
+    property ParentCtl3D;
+    property ParentDoubleBuffered;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Touch;
+    property Visible;
+    property StyleElements;
+    property OnAlignInsertBefore;
+    property OnAlignPosition;
+    property OnClick;
     property OnCheckClick: TNotifyEvent read FOnCheckClick write FOnCheckClick;
+    property OnContextPopup;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDockDrop;
+    property OnDockOver;
+    property OnDragOver;
+    property OnEndDock;
+    property OnEndDrag;
+    property OnEnter;
+    property OnExit;
+    property OnGesture;
+    property OnGetSiteInfo;
+    property OnMouseActivate;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDock;
+    property OnStartDrag;
+    property OnUnDock;
   end;
 
 procedure Register;
@@ -168,7 +223,9 @@ begin
 constructor TCheckComboBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Init;
+  FListInstance:=MakeObjectInstance(ComboListWndProc);
+  FDefListProc:=nil;
+  FListHandle:=0;
   FCheckWidth:=GetSystemMetrics(SM_CXMENUCHECK);
   FCheckHeight:=FCheckWidth;
   ShowHint:=true;
@@ -191,7 +248,6 @@ end;
 procedure TCheckComboBox.Init;
 begin
   FListInstance:=MakeObjectInstance(ComboListWndProc);
-  FDefListProc:=nil;
   FListHandle:=0;
   end;
 
@@ -349,7 +405,7 @@ begin
         strText:=strText+strItem;
         end;
       if not ((csDesigning in ComponentState) or (csLoading in ComponentState)) then
-        Hint:=FHintPrefix+strText else Hint:='';
+        Hint:=FHintPrefix+strText; // else Hint:='';
       end;
     bCalcText:=false;
     end;
@@ -411,6 +467,7 @@ var
   nState : integer;
   strText : string;
   ItId : integer;
+  ncol,fcol,acol : TColor;
 begin             // 0 - No check, 1 - Empty check, 2 - Checked
   with Message.DrawItemStruct^ do begin
     State:=TOwnerDrawState(LongRec(itemState).Lo);
@@ -420,19 +477,30 @@ begin             // 0 - No check, 1 - Empty check, 2 - Checked
     ItId:=itemID;
     end;
   Canvas.Font:=Font;
+  if (StyleServices is TUxThemeStyle) then begin // default style 'Windows'
+    ncol:=FColorNotFocus; fcol:=FColorFocus; acol:=Color;
+    if (odDisabled in State) then Canvas.Font.Color:=clBtnShadow
+    else Canvas.Font.Color:=Font.Color;
+    end
+  else with StyleServices do begin
+    fcol:=GetStyleColor(scHintGradientEnd); ncol:=GetStyleColor(scComboBox);
+    acol:=GetStyleColor(scButtonNormal);
+    if (odDisabled in State) then Canvas.Font.Color:=GetStyleFontColor(sfComboBoxItemDisabled)
+    else Canvas.Font.Color:=GetStyleFontColor(sfComboBoxItemNormal);
+    end;
   // Check if we are drawing the static portion of the combobox
-  if (ItId<0) then begin
+  if (ItId<0) or (odComboBoxEdit in State) then begin
     RecalcText;
     if length(FFixedText)>0 then strText:=FFixedText else strText:=sHint;
     with Canvas do begin
-      if (odSelected in State) then Brush.Color:=FColorFocus
-      else Brush.Color:=FColorNotFocus;
+      if (odSelected in State) then Brush.Color:=fcol
+      else Brush.Color:=ncol;
       FillRect(rcText);
       end
     end
   else begin
     with Canvas do begin
-      Brush.Color:=self.Color;
+      Brush.Color:=acol;
       FillRect(rcText);
       end;
     strText:=GetLongString(ItId);
@@ -447,8 +515,6 @@ begin             // 0 - No check, 1 - Empty check, 2 - Checked
     end;
   strText:=' '+strText;
   with Canvas do begin
-    if (odDisabled in State) then Font.Color:=clBtnShadow
-    else Font.Color:=Font.Color;
     TextRect(rcText,strText,[]);
     if odFocused in State then DrawFocusRect(rcText);
     Handle:=0;
@@ -514,8 +580,7 @@ procedure TCheckComboBox.WndProc(var Message: TMessage);
 var
   lWnd: HWnd;
 begin
-  inherited WndProc(Message);
-  if message.Msg = WM_CTLCOLORLISTBOX then begin
+  if (message.Msg=WM_CTLCOLORLISTBOX) then begin
     // If the listbox hasn't been subclassed yet, do so...
     if (FListHandle = 0) then begin
       lWnd:=message.lParam;
@@ -526,7 +591,8 @@ begin
         SetWindowLongPtr(FListHandle,GWL_WNDPROC,LongInt(FListInstance));
         end;
       end;
-    end
+    end;
+  inherited WndProc(Message);
   end;
 
 { ------------------------------------------------------------------- }
@@ -539,9 +605,10 @@ begin
   CheckBox:=TCheckBox.Create(self);
   CheckBox.Parent:=self;
   with CheckBox do begin
-    Left:=8; Top:=-2; Width:=17; Caption:='';
+    Left:=FCheckWidth div 3; Top:=0; Width:=FCheckWidth; Caption:='';
     OnClick:=CheckClick;
     end;
+  Text:=' ';
   end;
 
 destructor TCheckGroupBox.Destroy;
@@ -554,6 +621,16 @@ procedure TCheckGroupBox.AfterConstruction;
 begin
   inherited AfterConstruction;
   Checked:=CheckBox.Checked;
+  end;
+
+function TCheckGroupBox.GetText : TCaption;
+begin
+  Result:=CheckBox.Caption;
+  end;
+
+procedure TCheckGroupBox.SetText(const Value: TCaption);
+begin
+  with CheckBox do if Caption<>Value then Caption:=Value;
   end;
 
 function TCheckGroupBox.GetChecked : boolean;
@@ -579,88 +656,73 @@ var
 begin
   for i:=0 to ControlCount-1 do
     if (Controls[i].Name<>CheckBox.Name) then Controls[i].Enabled:=CheckBox.Checked;
+  CheckBox.Hint:=Hint;
   inherited Invalidate;
   end;
 
 procedure TCheckGroupBox.Paint;
 var
   H: Integer;
-  R: TRect;
   Flags: Longint;
   CaptionRect,
   OuterRect: TRect;
-  Size: TSize;
-  Box: TThemedButton;
+  Size : TSize;
+  n    : integer;
+  Box  : TThemedButton;
   Details: TThemedElementDetails;
-begin
-  with Canvas do
-  begin
-    Font := Self.Font;
 
-    if ThemeControl(Self) then
-    begin
-      if Text <> '' then
-      begin
-        GetTextExtentPoint32(Handle, Text, Length(Text), Size);
-        CaptionRect := Rect(0, 0, Size.cx, Size.cy);
-        if not UseRightToLeftAlignment then
-          OffsetRect(CaptionRect, CbIndent, 0)
-        else
-          OffsetRect(CaptionRect, Width - CbIndent - CaptionRect.Right, 0);
-      end
-      else
-        CaptionRect := Rect(0, 0, 0, 0);
+  function FillSpace (len : integer) : string;
+  var
+    i : integer;
+  begin
+    Result:='';
+    for i:=1 to len do Result:=Result+' ';
+    end;
+
+begin
+  with Canvas do begin
+    Font := Self.Font;
+    with CheckBox do begin
+      Width:=MulDiv(FCheckWidth+TextWidth(Caption),120,100);
+      n:=Length(Caption);
+      Size:=TextExtent(Caption);
+      end;
+    if ThemeControl(Self) then begin
+      CaptionRect := Rect(0, 0, Size.cx, Size.cy);
+      if not UseRightToLeftAlignment then OffsetRect(CaptionRect, CbIndent, 0)
+      else OffsetRect(CaptionRect, Width - CbIndent - CaptionRect.Right, 0);
 
       OuterRect := ClientRect;
       OuterRect.Top := (CaptionRect.Bottom - CaptionRect.Top) div 2;
-      with CaptionRect do
-        ExcludeClipRect(Handle, Left, Top, Right, Bottom);
-      if Enabled then
-        Box := tbGroupBoxNormal
-      else
-        Box := tbGroupBoxDisabled;
+      with CaptionRect do ExcludeClipRect(Handle, Left, Top, Right, Bottom);
+      if Enabled then Box := tbGroupBoxNormal
+      else Box := tbGroupBoxDisabled;
       Details := StyleServices.GetElementDetails(Box);
       StyleServices.DrawElement(Handle, Details, OuterRect);
 
       SelectClipRgn(Handle, 0);
       Brush.Style := bsClear;
-      if Text <> '' then
-        if IsRightToLeft then
-        begin
-          Flags := DrawTextBiDiModeFlags(DT_SINGLELINE);
-          StyleServices.DrawText(Handle, Details, Text, CaptionRect, Flags, 0);
-        end
-        else
-          StyleServices.DrawText(Handle, Details, Text, CaptionRect, [tfLeft]);
-    end
-    else
-    begin
-      H := TextHeight('0');
-      R := Rect(0, H div 2 - 1, Width, Height);
-      if Ctl3D then
-      begin
-        Inc(R.Left);
-        Inc(R.Top);
-        Brush.Color := clBtnHighlight;
-        FrameRect(R);
-        OffsetRect(R, -1, -1);
-        Brush.Color := clBtnShadow;
-      end else
-        Brush.Color := clWindowFrame;
-      FrameRect(R);
-      if Text <> '' then
-      begin
-        if not UseRightToLeftAlignment then
-          R := Rect(CbIndent, 0, 0, H)
-        else
-          R := Rect(R.Right - Canvas.TextWidth(Text) - CbIndent, 0, 0, H);
+      if IsRightToLeft then begin
         Flags := DrawTextBiDiModeFlags(DT_SINGLELINE);
-        DrawText(Handle, Text, Length(Text), R, Flags or DT_CALCRECT);
-        Brush.Color := Color;
-        DrawText(Handle, Text, Length(Text), R, Flags);
+        StyleServices.DrawText(Handle, Details, FillSpace(n), CaptionRect, Flags, 0);
+        end
+      else StyleServices.DrawText(Handle, Details, FillSpace(n), CaptionRect, [tfLeft]);
+      end
+    else begin
+      H := TextHeight('0');
+      CaptionRect := Rect(0, H div 2 - 1, Width, Height);
+      if Ctl3D then begin
+        Inc(CaptionRect.Left);
+        Inc(CaptionRect.Top);
+        Brush.Color := clBtnHighlight;
+        FrameRect(CaptionRect);
+        OffsetRect(CaptionRect, -1, -1);
+        Brush.Color := clBtnShadow;
+        end
+      else Brush.Color := clWindowFrame;
+      FrameRect(CaptionRect);
       end;
     end;
   end;
-end;
 
 end.
