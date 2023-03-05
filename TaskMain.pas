@@ -153,9 +153,14 @@ begin
   end;
 
 procedure TMainForm.btnRefreshClick(Sender: TObject);
+var
+  s : string;
 begin
-  WinTasks.Refresh;
-  UpdateListView(0);
+  with lvTasks do s:=Items[ItemIndex].Caption;
+  with WinTasks do begin
+    Refresh;
+    UpdateListView(GetListIndex(TaskFolder.IndexOfTask(s)));
+    end;
   end;
 
 procedure TMainForm.UpdateListView (AIndex : integer);
