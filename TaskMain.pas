@@ -47,6 +47,7 @@ type
     Timer: TTimer;
     paTop: TPanel;
     imgHeader: TImageList;
+    btnRefresh: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -62,6 +63,7 @@ type
     procedure lvTasksColumnClick(Sender: TObject; Column: TListColumn);
     procedure lvTasksCompare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
+    procedure btnRefreshClick(Sender: TObject);
   private
     { Private-Deklarationen }
     WinTasks : TWinTaskScheduler;
@@ -148,6 +150,12 @@ begin
     end;
   Result:=i>=0;
   fl.Free;
+  end;
+
+procedure TMainForm.btnRefreshClick(Sender: TObject);
+begin
+  WinTasks.Refresh;
+  UpdateListView(0);
   end;
 
 procedure TMainForm.UpdateListView (AIndex : integer);
