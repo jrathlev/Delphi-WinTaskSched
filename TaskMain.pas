@@ -64,6 +64,7 @@ type
     procedure lvTasksCompare(Sender: TObject; Item1, Item2: TListItem;
       Data: Integer; var Compare: Integer);
     procedure btnRefreshClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private-Deklarationen }
     WinTasks : TWinTaskScheduler;
@@ -108,6 +109,12 @@ procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   WinTasks.Free;
 //  CoUninitialize;
+  end;
+
+procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key=VK_F5) then btnRefreshClick(Sender);
   end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -308,8 +315,7 @@ begin
 
 procedure TMainForm.TimerTimer(Sender: TObject);
 begin
-  UpdateListView(lvTasks.ItemIndex);
-//  ShowData(lvTasks.Items[lvTasks.ItemIndex],true);
+  btnRefreshClick(Sender);
   end;
 
 function TMainForm.GetListIndex (ATaskIndex : integer) : integer;

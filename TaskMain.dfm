@@ -10,9 +10,11 @@ object MainForm: TMainForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
@@ -650,8 +652,6 @@ object MainForm: TMainForm
     OnCompare = lvTasksCompare
     OnDblClick = btbEditClick
     OnSelectItem = lvTasksSelectItem
-    ExplicitTop = 21
-    ExplicitHeight = 179
   end
   object paTop: TPanel
     Left = 0
@@ -740,7 +740,7 @@ object MainForm: TMainForm
     Left = 517
     Top = 68
     Bitmap = {
-      494C0101020010090C0B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010102001009100B10001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
