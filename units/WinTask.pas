@@ -22,7 +22,7 @@ unit WinTask;
 interface
 
 uses
-  Winapi.Windows, System.Classes, System.SysUtils, System.Contnrs, TaskSchedApi;
+  Winapi.Windows, System.Classes, System.Contnrs, TaskSchedApi;
 
 const
   BitMask : array [1..16] of word = (1,2,4,8,$10,$20,$40,$80,$100,$200,$400,$800,
@@ -454,13 +454,9 @@ function CreateWinTaskScheduler (var TaskSchedule : TWinTaskScheduler) : HResult
 
 implementation
 
-uses System.Win.ComObj, System.DateUtils, System.Math, System.StrUtils, Winapi.ActiveX,
-  Winapi.WinSvc, System.Variants, WinTaskConsts;
+uses System.SysUtils, System.Win.ComObj, System.DateUtils, System.Math, System.StrUtils,
+  Winapi.ActiveX, Winapi.WinSvc, System.Variants, WinTaskConsts;
 
-const
-  TaskTriggerNames : array[TWinTaskTriggerType] of string =
-    ('Event','Time','Daily','Weekly','Monthly','MonthlyDow','Idle','Register',
-     'Boot','Logon','State','Custom');
 var
   TaskStateNames : array[TWinTaskStatus] of pointer =
     (@rsTrgUnknown,@rsTrgReady,@rsTrgQueued,@rsTrgRunning,@rsTrgDisabled);
