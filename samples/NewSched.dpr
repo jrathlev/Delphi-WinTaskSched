@@ -23,8 +23,7 @@ program NewSched;
 
 {$R *.res}
 
-uses Winapi.Windows, Winapi.Messages, System.SysUtils, Winapi.ActiveX,
-  TaskSchedApi, WinTask;
+uses System.SysUtils, Winapi.ActiveX, TaskSchedApi, WinTask;
 
 function ErrorMsg (const s : string; hr : HResult) : string;
 begin
