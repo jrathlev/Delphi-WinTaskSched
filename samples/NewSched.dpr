@@ -22,6 +22,8 @@ program NewSched;
 {$APPTYPE CONSOLE}
 
 {$R *.res}
+{$WEAKLINKRTTI ON}
+{$RTTI EXPLICIT METHODS([]) PROPERTIES([]) FIELDS([])}
 
 uses System.SysUtils, Winapi.ActiveX, TaskSchedApi, WinTask;
 
@@ -74,6 +76,7 @@ begin
             ApplicationPath:=TaskApp;
             Arguments:='';
             end;
+          DeleteExpiredTaskAfter:=24; // hours
           with NewTrigger(ttTime) do begin
             StopAtDurationEnd:=false;
             Interval:=1800;  // 30 min = 1800 s
