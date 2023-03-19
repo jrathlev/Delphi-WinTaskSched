@@ -154,8 +154,6 @@ type
     FTriggerType : TWinTaskTriggerType;
     FTimeZone : boolean;
     FTimeOffset : integer; // time zone offset in minutes
-    function TimeStringToSeconds (TimeString : string) : cardinal;
-    function SecondsToTimeString (Seconds : cardinal) : string;
 
     function GetDaysOfWeek : integer;
     procedure SetDaysOfWeek (Value : integer);
@@ -280,6 +278,10 @@ type
     function GetCompatibility : TWinTaskCompatibility;
     procedure SetCompatibility (Value : TWinTaskCompatibility);
     function GetCompatibilityAsString : string;
+    function GetDeleteExpiredTaskAfter : cardinal;  // time in hours
+    procedure SetDeleteExpiredTaskAfter (const Value : cardinal);
+    function GetExecutionTimeLimit : cardinal;  // time in hours
+    procedure SetExecutionTimeLimit (const Value : cardinal);
     function GetRunIfMissed : boolean;
     procedure SetRunIfMissed (Value : boolean);
     function GetRunOnlyIfNetwork : boolean;
@@ -316,10 +318,12 @@ type
     property UserData : string read GetData write SetData;
     property Date : TDateTime read GetDate write SetDate;
     property DateAsString : string read GetDateAsString;
+    property DeleteExpiredTaskAfter : cardinal read GetDeleteExpiredTaskAfter write SetDeleteExpiredTaskAfter;
     property Description : string read GetDescription write SetDescription;
     property DisallowOnBatteries : boolean read GetDisallowOnBatteries write SetDisallowOnBatteries;
     property DisplayName : string read GetDisplayName write SetDisplayName;
     property Documentation : string read GetDocumentation write SetDocumentation;
+    property ExecutionTimeLimit : cardinal read GetExecutionTimeLimit  write SetExecutionTimeLimit;
     property GroupId : string read GetGroupId write SetGroupId;
     property Hidden : boolean read GetHidden write SetHidden;
     property Id : string read GetId write SetId;
@@ -661,6 +665,44 @@ begin
     end;
   end;
 
+function TimeStringToSeconds (TimeString : string) : cardinal;
+var
+  n : word;
+begin
+  Result:=0;
+  if AnsiStartsText('P',TimeString) then begin
+    Delete(TimeString,1,1);
+    if AnsiStartsText('T',TimeString) then begin  // time
+      repeat
+        n:=ReadNextValue(TimeString);
+        if AnsiStartsText('H',TimeString) then Result:=Result+SecsPerHour*n;
+        if AnsiStartsText('M',TimeString) then Result:=Result+SecsPerMin*n;
+        if AnsiStartsText('S',TimeString) then Result:=Result+n;
+        if length(TimeString)>0 then delete(TimeString,1,1);
+        until length(TimeString)=0;
+      end
+    else begin // days
+      n:=ReadNextValue(TimeString);
+      if AnsiStartsText('D',TimeString) then Result:=Result+SecsPerDay*n;
+      end;
+    end
+  end;
+
+function SecondsToTimeString (Seconds : cardinal) : string;
+var
+  h,m,s : word;
+begin
+  if Seconds=0 then Result:=''
+  else if Seconds>=SecsPerDay then Result:='P'+IntToStr(Seconds div SecsPerDay)+'D'
+  else begin
+    Result:='PT';
+    DivMod(Seconds ,SecsPerHour,h,m); DivMod(m,SecsPerMin,m,s);
+    if h>0 then Result:=Result+IntToStr(h)+'H';
+    if m>0 then Result:=Result+IntToStr(m)+'M';
+    if s>0 then Result:=Result+IntToStr(s)+'S';
+    end;
+  end;
+
 {------------------------------------------------------------------- }
 destructor TWinTaskAction.Destroy;
 begin
@@ -902,44 +944,6 @@ begin
   FTriggerType:=GetTriggerType;
 //  if length(Id)=0 then SetId('Trigger'+IntToStr(Index+1));
   FTimeZone:=BoundaryToTimeInfo(pTrigger.StartBoundary).TimeZone;
-  end;
-
-function TWinTaskTrigger.TimeStringToSeconds (TimeString : string) : cardinal;
-var
-  n : word;
-begin
-  Result:=0;
-  if AnsiStartsText('P',TimeString) then begin
-    Delete(TimeString,1,1);
-    if AnsiStartsText('T',TimeString) then begin  // time
-      repeat
-        n:=ReadNextValue(TimeString);
-        if AnsiStartsText('H',TimeString) then Result:=Result+SecsPerHour*n;
-        if AnsiStartsText('M',TimeString) then Result:=Result+SecsPerMin*n;
-        if AnsiStartsText('S',TimeString) then Result:=Result+n;
-        if length(TimeString)>0 then delete(TimeString,1,1);
-        until length(TimeString)=0;
-      end
-    else begin // days
-      n:=ReadNextValue(TimeString);
-      if AnsiStartsText('D',TimeString) then Result:=Result+SecsPerDay*n;
-      end;
-    end
-  end;
-
-function TWinTaskTrigger.SecondsToTimeString (Seconds : cardinal) : string;
-var
-  h,m,s : word;
-begin
-  if Seconds=0 then Result:=''
-  else if Seconds>=SecsPerDay then Result:='P'+IntToStr(Seconds div SecsPerDay)+'D'
-  else begin
-    Result:='PT';
-    DivMod(Seconds ,SecsPerHour,h,m); DivMod(m,SecsPerMin,m,s);
-    if h>0 then Result:=Result+IntToStr(h)+'H';
-    if m>0 then Result:=Result+IntToStr(m)+'M';
-    if s>0 then Result:=Result+IntToStr(s)+'S';
-    end;
   end;
 
 function TWinTaskTrigger.GetDaysOfWeek : integer;
@@ -1550,6 +1554,26 @@ begin
 function TWinTask.GetCompatibilityAsString : string;
 begin
   Result:=LoadResString(CompatibilityNames[GetCompatibility]);
+  end;
+
+function TWinTask.GetDeleteExpiredTaskAfter : cardinal;  // time in hours
+begin
+  Result:=TimeStringToSeconds(pDefinition.Settings.DeleteExpiredTaskAfter) div SecsPerHour;
+  end;
+
+procedure TWinTask.SetDeleteExpiredTaskAfter (const Value : cardinal);
+begin
+  pDefinition.Settings.DeleteExpiredTaskAfter:=SecondsToTimeString(Value*SecsPerHour);
+  end;
+
+function TWinTask.GetExecutionTimeLimit : cardinal;  // time in hours
+begin
+  Result:=TimeStringToSeconds(pDefinition.Settings.ExecutionTimeLimit) div SecsPerHour;
+  end;
+
+procedure TWinTask.SetExecutionTimeLimit (const Value : cardinal);
+begin
+  pDefinition.Settings.ExecutionTimeLimit:=SecondsToTimeString(Value*SecsPerHour);
   end;
 
 function TWinTask.GetRunIfMissed : boolean;
