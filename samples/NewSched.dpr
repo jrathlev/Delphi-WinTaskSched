@@ -25,7 +25,7 @@ program NewSched;
 {$WEAKLINKRTTI ON}
 {$RTTI EXPLICIT METHODS([]) PROPERTIES([]) FIELDS([])}
 
-uses System.SysUtils, Winapi.ActiveX, TaskSchedApi, WinTask;
+uses System.SysUtils, System.DateUtils, Winapi.ActiveX, TaskSchedApi, WinTask;
 
 function ErrorMsg (const s : string; hr : HResult) : string;
 begin
@@ -76,8 +76,15 @@ begin
             ApplicationPath:=TaskApp;
             Arguments:='';
             end;
-          DeleteExpiredTaskAfter:=24; // hours
+          with Settings do begin
+            RunOnlyIfIdle:=true;
+            IdleSettings.IdleDuration:=600;  // seconds
+            IdleSettings.WaitTimeout:=300;
+            DeleteExpiredTaskAfter:=24;      // hours
+            end;
           with NewTrigger(ttTime) do begin
+            StartTime:=Now;
+            EndTime:=Now+10;  // EncodeDateTime(2023,5,31,12,0,0,0);
             StopAtDurationEnd:=false;
             Interval:=1800;  // 30 min = 1800 s
             Duration:=0;     // unlimited
