@@ -19,7 +19,7 @@ unit AdvancedScheduleDlg;
 
 interface
 
-uses Winapi.Windows, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Forms,
+uses Winapi.Windows, System.SysUtils, System.Classes, Vcl.Forms,
   Vcl.Controls, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ComCtrls;
 
 type

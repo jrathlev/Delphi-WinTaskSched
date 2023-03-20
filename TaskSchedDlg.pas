@@ -670,7 +670,7 @@ begin
       if length(Author)=0 then Author:=UserId;
       end;
     edJobName.Text:=ATaskName;
-    rgPriority.ItemIndex:=integer(Priority);
+    rgPriority.ItemIndex:=integer(Settings.Priority);
     leDesc.Text:=Description;
     if LogonType=ltToken then rbLoggedUser.Checked:=true else rbAnyUser.Checked:=true;
     ShowSecOptions;
@@ -683,8 +683,10 @@ begin
       end;
     edUser.Text:=UserId;
     edPwd.Text:='';
-    AdvSet.ReRun:=RunIfMissed;
-    if Compatibility<=tcXP then Compatibility:=GetDefaultCompatibility;
+    with Settings do begin
+      AdvSet.ReRun:=RunIfMissed;
+      if Compatibility<=tcXP then Compatibility:=GetDefaultCompatibility;
+      end;
     ok:=true;
     if TriggerCount>0 then TrgNr:=0 else TrgNr:=-1;
     if TrgNr>=0 then begin
@@ -822,7 +824,7 @@ begin
       UserId:=AUsername;
       Description:=leDesc.Text;
       if rbLoggedUser.Checked then LogonType:=ltToken else LogonType:=ltPassword;
-      RunIfMissed:=AdvSet.ReRun;
+      Settings.RunIfMissed:=AdvSet.ReRun;
       with FTaskAction do begin
         WorkingDirectory:=MakeQuotedStr(edWorkDir.Text,[' ',',']);
         ApplicationPath:=edProg.Text;
@@ -924,7 +926,7 @@ begin
           end;
         StartTime:=DateOf(bd)+round(MinsPerDay*TimeOf(bt))/MinsPerDay;  // Sekunden = 0
         end;
-      Priority:=TThreadPriority(rgPriority.ItemIndex);
+      Settings.Priority:=TThreadPriority(rgPriority.ItemIndex);
       end;
     end
   end;
