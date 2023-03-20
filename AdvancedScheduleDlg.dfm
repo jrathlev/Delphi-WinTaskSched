@@ -81,7 +81,6 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     ModalResult = 1
     NumGlyphs = 2
     TabOrder = 0
-    ExplicitTop = 319
   end
   object CancelBtn: TBitBtn
     Left = 218
@@ -145,7 +144,6 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     ModalResult = 2
     NumGlyphs = 2
     TabOrder = 1
-    ExplicitTop = 319
   end
   object paEnd: TPanel
     Left = 0
@@ -243,6 +241,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
       Height = 17
       Caption = 'Duration:'
       TabOrder = 3
+      OnClick = cbRepeatClick
     end
     object paDuration: TPanel
       Left = 75
