@@ -277,8 +277,8 @@ type
     procedure SetAllowHardTerminate (Value : boolean);
     function GetCompatibility : TWinTaskCompatibility;
     procedure SetCompatibility (Value : TWinTaskCompatibility);
-    function GetDeleteExpiredTaskAfter : cardinal;  // time in hours
-    procedure SetDeleteExpiredTaskAfter (const Value : cardinal);
+    function GetDeleteExpiredTaskAfter : integer;  // time in hours
+    procedure SetDeleteExpiredTaskAfter (const Value : integer);
     function GetExecutionTimeLimit : cardinal;  // time in hours
     procedure SetExecutionTimeLimit (const Value : cardinal);
     function GetHidden : boolean;
@@ -308,7 +308,7 @@ type
     property AllowDemandStart : boolean read GetAllowDemandStart write SetAllowDemandStart;
     property AllowHardTerminate : boolean read GetAllowHardTerminate write SetAllowHardTerminate;
     property Compatibility : TWinTaskCompatibility read GetCompatibility write SetCompatibility;
-    property DeleteExpiredTaskAfter : cardinal read GetDeleteExpiredTaskAfter write SetDeleteExpiredTaskAfter;
+    property DeleteExpiredTaskAfter : integer read GetDeleteExpiredTaskAfter write SetDeleteExpiredTaskAfter;
     property DisallowOnBatteries : boolean read GetDisallowOnBatteries write SetDisallowOnBatteries;
     property ExecutionTimeLimit : cardinal read GetExecutionTimeLimit  write SetExecutionTimeLimit;
     property Hidden : boolean read GetHidden write SetHidden;
@@ -1540,14 +1540,26 @@ begin
   pSettings.Compatibility:=Compatibilities[Value];
   end;
 
-function TWinTaskSettings.GetDeleteExpiredTaskAfter : cardinal;  // time in hours
+// DeleteExpiredTaskAfter = -1  disabled
+//                        =  0  immediate
+//                        >  0  number of hours
+function TWinTaskSettings.GetDeleteExpiredTaskAfter : integer;
+var
+  s : string;
 begin
-  Result:=TimeStringToSeconds(pSettings.DeleteExpiredTaskAfter) div SecsPerHour;
+  s:=pSettings.DeleteExpiredTaskAfter;
+  if length(s)>0 then Result:=TimeStringToSeconds(s) div SecsPerHour
+  else Result:=-1;
   end;
 
-procedure TWinTaskSettings.SetDeleteExpiredTaskAfter (const Value : cardinal);
+procedure TWinTaskSettings.SetDeleteExpiredTaskAfter (const Value : integer);
+var
+  s : string;
 begin
-  pSettings.DeleteExpiredTaskAfter:=SecondsToTimeString(Value*SecsPerHour);
+  if Value<0 then s:=''
+  else if Value=0 then s:='PT0S'
+  else s:=SecondsToTimeString(Value*SecsPerHour);
+  pSettings.DeleteExpiredTaskAfter:=s;
   end;
 
 function TWinTaskSettings.GetExecutionTimeLimit : cardinal;  // time in hours
@@ -1812,6 +1824,7 @@ begin
   TASK_LOGON_GROUP  : Result:=ltGroup;
   TASK_LOGON_SERVICE_ACCOUNT  : Result:=ltService;
   TASK_LOGON_INTERACTIVE_TOKEN_OR_PASSWORD  : Result:=ltTokenPassword;
+  else Result:=ltNone;
     end;
   end;
 
