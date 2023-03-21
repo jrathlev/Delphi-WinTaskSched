@@ -80,7 +80,10 @@ begin
             RunOnlyIfIdle:=true;
             IdleSettings.IdleDuration:=600;  // seconds
             IdleSettings.WaitTimeout:=300;
-            DeleteExpiredTaskAfter:=24;      // hours
+            DeleteExpiredTaskAfter:=0;
+            // = -1 disabled
+            // = 0  immediate
+            // > 0  number of hours
             end;
           with NewTrigger(ttTime) do begin
             StartTime:=Now;
