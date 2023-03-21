@@ -3,8 +3,8 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   Top = 341
   BorderStyle = bsDialog
   Caption = 'Advanced Schedule Options'
-  ClientHeight = 311
-  ClientWidth = 325
+  ClientHeight = 316
+  ClientWidth = 326
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,13 +15,13 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
-    325
-    311)
+    326
+    316)
   PixelsPerInch = 96
   TextHeight = 13
   object OKBtn: TBitBtn
-    Left = 143
-    Top = 276
+    Left = 144
+    Top = 281
     Width = 71
     Height = 31
     Anchors = [akRight, akBottom]
@@ -83,8 +83,8 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
     TabOrder = 0
   end
   object CancelBtn: TBitBtn
-    Left = 218
-    Top = 276
+    Left = 219
+    Top = 281
     Width = 101
     Height = 31
     Anchors = [akRight, akBottom]
@@ -148,7 +148,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   object paEnd: TPanel
     Left = 0
     Top = 0
-    Width = 325
+    Width = 326
     Height = 41
     Align = alTop
     BevelOuter = bvNone
@@ -187,21 +187,28 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   object paRepeat: TPanel
     Left = 0
     Top = 66
-    Width = 325
-    Height = 95
+    Width = 326
+    Height = 101
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 3
     object Label8: TLabel
-      Left = 25
-      Top = 13
+      Left = 30
+      Top = 8
       Width = 32
       Height = 13
       Caption = 'every:'
     end
+    object Label1: TLabel
+      Left = 30
+      Top = 43
+      Width = 83
+      Height = 13
+      Caption = 'for a duration of:'
+    end
     object cbRepUnit: TComboBox
-      Left = 155
-      Top = 10
+      Left = 215
+      Top = 5
       Width = 91
       Height = 21
       Style = csDropDownList
@@ -214,8 +221,8 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
         'minute(s)')
     end
     object edInterval: TEdit
-      Left = 110
-      Top = 10
+      Left = 175
+      Top = 5
       Width = 31
       Height = 21
       Alignment = taRightJustify
@@ -223,8 +230,8 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
       Text = '1'
     end
     object udInterval: TUpDown
-      Left = 94
-      Top = 10
+      Left = 159
+      Top = 5
       Width = 17
       Height = 21
       AlignButton = udLeft
@@ -234,82 +241,55 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
       Position = 1
       TabOrder = 2
     end
-    object cbDuration: TCheckBox
-      Left = 25
-      Top = 45
-      Width = 221
-      Height = 17
-      Caption = 'Duration:'
+    object cbStopAtEnd: TCheckBox
+      Left = 30
+      Top = 72
+      Width = 286
+      Height = 26
+      Caption = 'Stop all running tasks at end of repetition duration'
       TabOrder = 3
+      WordWrap = True
       OnClick = cbRepeatClick
     end
-    object paDuration: TPanel
-      Left = 75
-      Top = 65
-      Width = 246
-      Height = 31
-      BevelOuter = bvNone
+    object edDuration: TEdit
+      Left = 175
+      Top = 40
+      Width = 31
+      Height = 21
+      Alignment = taRightJustify
       TabOrder = 4
-      object Label2: TLabel
-        Left = 75
-        Top = 8
-        Width = 35
-        Height = 13
-        Caption = 'hour(s)'
-      end
-      object Label3: TLabel
-        Left = 184
-        Top = 8
-        Width = 45
-        Height = 13
-        Caption = 'minute(s)'
-      end
-      object udMinutes: TUpDown
-        Left = 129
-        Top = 5
-        Width = 16
-        Height = 21
-        AlignButton = udLeft
-        Associate = edMinutes
-        Max = 60
-        Position = 1
-        TabOrder = 0
-      end
-      object edHours: TEdit
-        Left = 35
-        Top = 5
-        Width = 31
-        Height = 21
-        Alignment = taRightJustify
-        TabOrder = 1
-        Text = '1'
-      end
-      object udHours: TUpDown
-        Left = 19
-        Top = 5
-        Width = 16
-        Height = 21
-        AlignButton = udLeft
-        Associate = edHours
-        Max = 24
-        Position = 1
-        TabOrder = 2
-      end
-      object edMinutes: TEdit
-        Left = 145
-        Top = 5
-        Width = 31
-        Height = 21
-        Alignment = taRightJustify
-        TabOrder = 3
-        Text = '1'
-      end
+      Text = '1'
+    end
+    object udDuration: TUpDown
+      Left = 159
+      Top = 40
+      Width = 16
+      Height = 21
+      AlignButton = udLeft
+      Associate = edDuration
+      Max = 24
+      Position = 1
+      TabOrder = 5
+    end
+    object cbDurUnit: TComboBox
+      Left = 215
+      Top = 40
+      Width = 91
+      Height = 21
+      Style = csDropDownList
+      ItemIndex = 0
+      TabOrder = 6
+      Text = 'hour(s)'
+      OnCloseUp = cbDurUnitCloseUp
+      Items.Strings = (
+        'hour(s)'
+        'minute(s)')
     end
   end
   object paRepHeader: TPanel
     Left = 0
     Top = 41
-    Width = 325
+    Width = 326
     Height = 25
     Align = alTop
     BevelOuter = bvNone
@@ -326,14 +306,14 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   end
   object paLimit: TPanel
     Left = 0
-    Top = 161
-    Width = 325
+    Top = 167
+    Width = 326
     Height = 71
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 5
     object cbLimitUnit: TComboBox
-      Left = 155
+      Left = 215
       Top = 35
       Width = 91
       Height = 21
@@ -357,7 +337,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
       OnClick = cbLimitClick
     end
     object udLimit: TUpDown
-      Left = 94
+      Left = 159
       Top = 35
       Width = 16
       Height = 21
@@ -369,7 +349,7 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
       TabOrder = 2
     end
     object edLimit: TEdit
-      Left = 110
+      Left = 175
       Top = 35
       Width = 31
       Height = 21
@@ -380,16 +360,16 @@ object AdvancedScheduleDialog: TAdvancedScheduleDialog
   end
   object paReRun: TPanel
     Left = 0
-    Top = 232
-    Width = 325
+    Top = 238
+    Width = 326
     Height = 36
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 6
     object cbReRun: TCheckBox
       Left = 15
-      Top = 5
-      Width = 291
+      Top = 3
+      Width = 296
       Height = 26
       Caption = 'Run task as soon as possible after a scheduled start is missed'
       TabOrder = 0
