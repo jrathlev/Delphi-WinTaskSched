@@ -17,6 +17,9 @@
 
 unit TaskSchedDlg;
 
+{$HINTS OFF}
+{$WARN SYMBOL_DEPRECATED OFF}
+
 interface
 
 uses Winapi.Windows, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Forms,
@@ -201,6 +204,56 @@ begin
   Strdispose(p);
   end;
 
+type
+  TGetUserNameEx = function (NameFormat : DWORD; lpBuffer: LPWSTR; var nSize: DWORD): BOOL; stdcall;
+
+const
+  secur32 = 'Secur32.dll';
+
+  // from secur32.dll
+  NameUnknown            = 0;
+  NameFullyQualifiedDN   = 1;
+  NameSamCompatible      = 2;
+  NameDisplay            = 3;
+  NameUniqueId           = 6;
+  NameCanonical          = 7;
+  NameUserPrincipal      = 8;
+  NameCanonicalEx        = 9;
+  NameServicePrincipal   = 10;
+  NameDnsDomain          = 12;
+
+function GetExtendedUserName(NameFormat : DWORD; var UserName : string) : boolean;
+var
+  p : pchar;
+  size : dword;
+  Secur32Handle : THandle;
+  GetUserNameEx : TGetUserNameEx;
+begin
+  Result:=false;
+  Secur32Handle:=SafeLoadLibrary(secur32);
+  try
+    if Secur32Handle<>0 then begin
+      GetUserNameEx:=GetProcAddress(Secur32Handle,'GetUserNameExW');
+      if assigned(GetUserNameEx) then begin
+        size:=1024;
+        p:=StrAlloc(size);
+        if GetUserNameEx (NameFormat,p,size) then begin
+          UserName:=p;
+          Result:=true;
+          end;
+        StrDispose(p);
+        end;
+      end;
+  finally
+    FreeLibrary(Secur32Handle);
+    end;
+  end;
+
+function UserFullName : string;
+begin
+  if not GetExtendedUserName(NameSamCompatible,Result) then Result:=UserName;
+  end;
+
 function SystemDirectory : string;
 var
   p : pchar;
@@ -321,7 +374,7 @@ procedure TTaskScheduleDialog.ShowSecOptions;
 begin
   if rbLoggedUser.Checked then begin
     with edUser do begin
-      Text:=UserName;         // logged on user
+      Text:=UserFullName;         // logged on user
       Enabled:=false;
       end;
     edPwd.Visible:=false;
@@ -663,7 +716,7 @@ begin
   pcMain.ActivePage:=tsProgram;
   pcSteps.ActivePageIndex:=0;
   sp:='';
-  if length(AUsername)=0 then AUserName:=UserName;
+  if length(AUsername)=0 then AUserName:=UserFullName;
   with ASchedTask do begin
     if length(UserId)=0 then begin
       UserId:=AUsername;
@@ -844,12 +897,13 @@ begin
         if (FTrgType<>NewTrgType) then begin
           if not DeleteTrigger(TrgNr) then begin
             MessageDlg(Format('Could not delete trigger (%u)'+sLineBreak+'Task: ',[TrgNr,FTaskName]),mtError,[mbOK],0);
+            Result:=false;
             end
           else FTrigger:=NewTrigger(NewTrgType);
           end;
         end
       else FTrigger:=NewTrigger(NewTrgType);
-      with FTrigger do begin
+      if Result then with FTrigger do begin
         Enabled:=cbEnabled.Checked;
         with AdvSet do begin
           if UseEndDate then begin
