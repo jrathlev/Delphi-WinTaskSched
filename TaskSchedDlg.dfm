@@ -24,16 +24,12 @@ object TaskScheduleDialog: TTaskScheduleDialog
     Top = 46
     Width = 465
     Height = 278
-    ActivePage = tsSchedule
+    ActivePage = tsProgram
     Align = alClient
     Style = tsButtons
     TabOrder = 1
     object tsProgram: TTabSheet
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object edWorkDir: TLabeledEdit
         Left = 5
         Top = 110
@@ -150,7 +146,6 @@ object TaskScheduleDialog: TTaskScheduleDialog
         EditLabel.Width = 128
         EditLabel.Height = 13
         EditLabel.Caption = 'Command line parameters:'
-        ReadOnly = True
         TabOrder = 4
       end
       object rgPriority: TRadioGroup
