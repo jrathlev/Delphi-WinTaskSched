@@ -20,6 +20,8 @@
 
 unit WinTask;
 
+{$WARN SYMBOL_PLATFORM OFF}
+
 interface
 
 uses
@@ -29,7 +31,7 @@ const
   BitMask : array [1..16] of word = (1,2,4,8,$10,$20,$40,$80,$100,$200,$400,$800,
      $1000,$2000,$4000,$8000);
 
-  NotAvailOnXp = $20001322;
+  NotAvailOnXp = HResult($A0001322);
 
 type
   TWinTaskStatus = (tsUnknown, tsReady, tsQueued, tsRunning, tsDisabled);
@@ -361,6 +363,7 @@ type
     function GetActionCount : Integer;
     function GetTrigger (Index: Integer) : TWinTaskTrigger;
     function GetTriggerCount : Integer;
+    function GetXml : string;
   public
     constructor Create(const ADefinition : ITaskDefinition);
     destructor Destroy; override;
@@ -390,6 +393,7 @@ type
     property TriggerCount : integer read GetTriggerCount;
     property UserData : string read GetData write SetData;
     property UserId : string read GetUserId write SetUserId;
+    property XmlText : string read GetXml;
     end;
 
   TWinRegisteredTask = class (TObject)
@@ -409,6 +413,7 @@ type
     function GetPath : string;
     function GetStatus : TWinTaskStatus;
     function GetStatusAsString: string;
+    function GetXml : string;
   public
     constructor Create(const ARegisteredTask : IRegisteredTask);
     destructor Destroy; override;
@@ -429,6 +434,7 @@ type
     property StatusAsString : string read GetStatusAsString;
     property TaskIndex : integer read FIndex write FIndex;
     property TaskName : string read FTaskName;
+    property Xml : string read GetXml;
     end;
 
   TWinTaskList = class (TObjectList);
@@ -1900,6 +1906,11 @@ begin
     end;
   end;
 
+function TWinTask.GetXml : string;
+begin
+  Result:=pDefinition.XmlText;
+  end;
+
 procedure TWinTask.Refresh;
 var
   i : word;
@@ -1925,7 +1936,6 @@ begin
   if Result>=ActionCount then Result:=-1;
   FSelectedAction:=Result;
   end;
-
 
 {------------------------------------------------------------------- }
 constructor TWinTaskSubfolder.Create (const ATaskFolder : ITaskFolder);
@@ -2042,6 +2052,11 @@ begin
 function TWinRegisteredTask.GetStatusAsString : string;
 begin
   Result:=LoadResString(TaskStateNames[Status]);
+  end;
+
+function TWinRegisteredTask.GetXml : string;
+begin
+  Result:=pRegisteredTask.Xml;
   end;
 
 function TWinRegisteredTask.IndexOfApp (const AppFilter : string) : integer;
