@@ -15,7 +15,8 @@
    Vers. 2.0 - January 2022
    Vers. 2.1 - March 2023 -  Repetition trigger fixed
    Vers. 2.2 - March 2023 - structure of WinTask redesigned (separate settings object)
-   last modified: March 2023
+   Vers. 2.3 - January 2024 - added: XML export
+   last modified: January 2024
    *)
 
 unit WinTask;
