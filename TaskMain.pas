@@ -22,7 +22,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.StdCtrls, Vcl.Buttons,
-  Vcl.ExtCtrls, WinTask, System.ImageList, Vcl.ImgList;
+  Vcl.ExtCtrls, WinTask, System.ImageList, Vcl.ImgList, Vcl.ExtDlgs;
 
 type
   TMainForm = class(TForm)
@@ -48,6 +48,8 @@ type
     paTop: TPanel;
     imgHeader: TImageList;
     btnRefresh: TSpeedButton;
+    btbExport: TBitBtn;
+    SaveTextFileDialog: TSaveTextFileDialog;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -65,6 +67,7 @@ type
       Data: Integer; var Compare: Integer);
     procedure btnRefreshClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure btbExportClick(Sender: TObject);
   private
     { Private-Deklarationen }
     WinTasks : TWinTaskScheduler;
@@ -403,6 +406,31 @@ begin
         ShowData(lvTasks.Items[n],true);
         end;
       end;
+    end;
+  end;
+
+procedure TMainForm.btbExportClick(Sender: TObject);
+var
+  se : TStringList;
+begin
+  if (SelectedTaskIndex>=0) then with WinTasks.TaskFolder.Tasks[SelectedTaskIndex] do begin
+    se:=TStringList.Create;
+    se.WriteBOM:=true;
+//    se.Text:=Xml;
+//    se.SaveToFile('xml.text');   // seems to be the same as XmlText but different order of sections
+    se.Text:=Definition.XmlText;
+    with SaveTextFileDialog do begin
+      with Encodings do begin
+        Clear;
+        AddObject('Unicode',TEncoding.Unicode);
+        AddObject('UTF-8',TEncoding.UTF8);
+        AddObject('ANSI',TEncoding.ANSI);
+        AddObject('ASCII',TEncoding.ASCII);
+        end;
+      EncodingIndex:=0;
+      if Execute then se.SaveToFile(Filename,Encodings.Objects[EncodingIndex] as TEncoding);
+      end;
+    se.Free;
     end;
   end;
 
