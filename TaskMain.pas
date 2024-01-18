@@ -417,7 +417,7 @@ begin
     se:=TStringList.Create;
     se.WriteBOM:=true;
 //    se.Text:=Xml;
-//    se.SaveToFile('xml.text');   // seems to be the same as XmlText but different order of sections
+//    se.SaveToFile('xml.txt');   // seems to be the same as XmlText but different order of sections
     se.Text:=Definition.XmlText;
     with SaveTextFileDialog do begin
       with Encodings do begin
