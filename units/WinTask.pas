@@ -365,6 +365,7 @@ type
     function GetTrigger (Index: Integer) : TWinTaskTrigger;
     function GetTriggerCount : Integer;
     function GetXml : string;
+    procedure SetXml (const AText : string);
   public
     constructor Create(const ADefinition : ITaskDefinition);
     destructor Destroy; override;
@@ -394,7 +395,7 @@ type
     property TriggerCount : integer read GetTriggerCount;
     property UserData : string read GetData write SetData;
     property UserId : string read GetUserId write SetUserId;
-    property XmlText : string read GetXml;
+    property XmlText : string read GetXml write SetXml;
     end;
 
   TWinRegisteredTask = class (TObject)
@@ -1910,6 +1911,12 @@ begin
 function TWinTask.GetXml : string;
 begin
   Result:=pDefinition.XmlText;
+  end;
+
+procedure TWinTask.SetXml (const AText : string);
+begin
+  pDefinition.XmlText:=AText;
+  Refresh;
   end;
 
 procedure TWinTask.Refresh;
