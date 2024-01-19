@@ -49,7 +49,9 @@ type
     imgHeader: TImageList;
     btnRefresh: TSpeedButton;
     btbExport: TBitBtn;
-    SaveTextFileDialog: TSaveTextFileDialog;
+    XmlSaveDialog: TSaveTextFileDialog;
+    btbImport: TBitBtn;
+    XmlOpenDialog: TOpenDialog;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -68,6 +70,7 @@ type
     procedure btnRefreshClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure btbExportClick(Sender: TObject);
+    procedure btbImportClick(Sender: TObject);
   private
     { Private-Deklarationen }
     WinTasks : TWinTaskScheduler;
@@ -357,7 +360,8 @@ begin
       end
     else begin
       ok:=MessageDlg('Task already exists - edit?',mtConfirmation,mbYesNo,0)=mrYes;
-      ok:=ok and TaskScheduleDialog.Execute(sn,TaskFolder.Tasks[n].Definition,user,pwd);
+      td:=TaskFolder.Tasks[n].Definition;
+      ok:=ok and TaskScheduleDialog.Execute(sn,td,user,pwd);
       end;
     if ok then with TaskFolder do begin
       n:=RegisterTask(sn,td,User,pwd);
@@ -369,7 +373,8 @@ begin
         UpdateListView(n);
         ShowData(lvTasks.Items[n],true);
         end;
-      end;
+      end
+    else if n<0 then td.Free;
     end;
   end;
 
@@ -419,7 +424,7 @@ begin
 //    se.Text:=Xml;
 //    se.SaveToFile('xml.txt');   // seems to be the same as XmlText but different order of sections
     se.Text:=Definition.XmlText;
-    with SaveTextFileDialog do begin
+    with XmlSaveDialog do begin
       with Encodings do begin
         Clear;
         AddObject('Unicode',TEncoding.Unicode);
@@ -428,9 +433,50 @@ begin
         AddObject('ASCII',TEncoding.ASCII);
         end;
       EncodingIndex:=0;
+      Title:='Export Scheduled Task to file';
       if Execute then se.SaveToFile(Filename,Encodings.Objects[EncodingIndex] as TEncoding);
       end;
     se.Free;
+    end;
+  end;
+
+procedure TMainForm.btbImportClick(Sender: TObject);
+var
+  td : TWinTask;
+  se : TStringList;
+  n  : integer;
+  sn,user,pwd : string;
+begin
+  with XmlOpenDialog do begin
+    Filename:='';
+    Title:='Import Scheduled Task from file';
+    if Execute then begin
+      sn:=ChangeFileExt(ExtractFileName(FileName),'');
+      if InputQuery('Imported task','Name of task:',sn) then begin
+        n:=WinTasks.TaskFolder.IndexOfTask(sn);
+        if n<0 then begin
+          se:=TStringList.Create;
+          se.LoadFromFile(Filename);
+          td:=WinTasks.NewTask;
+          td.XmlText:=se.Text;
+          td.Refresh;
+          se.Free;
+          if TaskScheduleDialog.Execute(sn,td,user,pwd) then with WinTasks.TaskFolder do begin
+            n:=RegisterTask(sn,td,User,pwd);
+            if n<0 then MessageDlg('Could not create scheduled task!'+sLineBreak
+              +SysErrorMessage(ResultCode(ErrorCode))+' - '+ErrorMessage,
+              mtError,[mbOK],0)
+            else begin
+              n:=GetListIndex(n);
+              UpdateListView(n);
+              ShowData(lvTasks.Items[n],true);
+              end;
+            end
+          else td.Free;
+          end
+        else MessageDlg(Format('Task already exists: %s',[sn]),mtError,[mbOK],0);
+        end;
+      end;
     end;
   end;
 
