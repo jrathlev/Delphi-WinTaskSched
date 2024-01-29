@@ -160,7 +160,6 @@ type
     FTriggerType : TWinTaskTriggerType;
     FTimeZone : boolean;
     FTimeOffset : integer; // time zone offset in minutes
-
     function GetDaysOfWeek : integer;
     procedure SetDaysOfWeek (Value : integer);
     function GetWeeksInterval : integer;
@@ -264,6 +263,7 @@ type
     procedure SetWaitTimeout (Value : cardinal);
   public
     constructor Create(AIdleSettings : IIdleSettings);
+    destructor Destroy; override;
     property IdleDuration : cardinal read GetIdleDuration write SetIdleDuration;  // time in seconds
     property RestartOnIdle : boolean read GetRestartOnIdle write SetRestartOnIdle;
     property StopOnIdleEnd : boolean read GetStopOnIdleEnd write SetStopOnIdleEnd;
@@ -308,6 +308,7 @@ type
     procedure SetWakeToRun (Value : boolean);
   public
     constructor Create(const ASettings : ITaskSettings);
+    destructor Destroy; override;
     property AllowDemandStart : boolean read GetAllowDemandStart write SetAllowDemandStart;
     property AllowHardTerminate : boolean read GetAllowHardTerminate write SetAllowHardTerminate;
     property Compatibility : TWinTaskCompatibility read GetCompatibility write SetCompatibility;
@@ -1464,6 +1465,12 @@ begin
   pIdleSettings:=AIdleSettings;
   end;
 
+destructor TWinTaskIdleSettings.Destroy;
+begin
+  pIdleSettings:=nil;
+  inherited Destroy;
+  end;
+
 function TWinTaskIdleSettings.GetIdleDuration : cardinal;
 begin
   Result:=TimeStringToSeconds(pIdleSettings.IdleDuration);
@@ -1510,6 +1517,13 @@ begin
   inherited Create;
   pSettings:=ASettings;
   FIdleSettings:=TWinTaskIdleSettings.Create(pSettings.IdleSettings);
+  end;
+
+destructor TWinTaskSettings.Destroy;
+begin
+  FreeAndNil(FIdleSettings);
+  pSettings:=nil;
+  inherited Destroy;
   end;
 
 function TWinTaskSettings.GetAllowDemandStart : boolean;
