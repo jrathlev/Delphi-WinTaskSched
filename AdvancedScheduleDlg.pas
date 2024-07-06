@@ -12,14 +12,14 @@
    the specific language governing rights and limitations under the License.
    
    Vers. 1 - Nov. 2013
-   last updated: March 2023
-*)
+   last updated: July 2024
+   *)
 
 unit AdvancedScheduleDlg;
 
 interface
 
-uses Winapi.Windows, System.SysUtils, System.Classes, Vcl.Forms,
+uses Winapi.Windows, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Forms,
   Vcl.Controls, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.ComCtrls;
 
 type
@@ -28,8 +28,12 @@ type
     RepeatTask,
     StopEndDuration,
     UseLimit,
-    ReRun      : boolean;
-    EndDate    : TDateTime;
+    ReRun,
+    PowerOnly,
+    StopBattery,
+    WakeUp,
+    NetworkOnly       : boolean;
+    EndDate           : TDateTime;
     MinutesLimit,
     MinutesInterval,
     MinutesDuration   : integer;    // in minutes
@@ -40,7 +44,6 @@ type
     CancelBtn: TBitBtn;
     cbExpire: TCheckBox;
     dpExpire: TDateTimePicker;
-    Label8: TLabel;
     cbLimit: TCheckBox;
     cbRepUnit: TComboBox;
     paRepeat: TPanel;
@@ -52,25 +55,35 @@ type
     paReRun: TPanel;
     cbReRun: TCheckBox;
     dtExpire: TDateTimePicker;
-    edInterval: TEdit;
-    udInterval: TUpDown;
-    edDuration: TEdit;
+    laEvery: TStaticText;
     udDuration: TUpDown;
+    edDuration: TEdit;
+    cbDurUnit: TComboBox;
+    cbStopAtEnd: TCheckBox;
+    laDuration: TStaticText;
+    udInterval: TUpDown;
+    edInterval: TEdit;
     udLimit: TUpDown;
     edLimit: TEdit;
-    cbStopAtEnd: TCheckBox;
-    Label1: TLabel;
-    cbDurUnit: TComboBox;
+    paEnergy: TPanel;
+    cbPower: TCheckBox;
+    paNetwork: TPanel;
+    cbNetwork: TCheckBox;
+    shSeparator: TShape;
+    cbOnBatteries: TCheckBox;
+    cbWakeUp: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cbExpireClick(Sender: TObject);
     procedure cbRepUnitCloseUp(Sender: TObject);
     procedure cbRepeatClick(Sender: TObject);
     procedure cbLimitClick(Sender: TObject);
     procedure cbLimitUnitCloseUp(Sender: TObject);
+    procedure cbComboBoxDrawItem(Control: TWinControl; Index: Integer; Rect: TRect;
+      State: TOwnerDrawState);
     procedure cbDurUnitCloseUp(Sender: TObject);
+    procedure cbPowerClick(Sender: TObject);
   private
     { Private declarations }
-    LastExpUnit : integer;
     procedure ShowRepeatPanel;
     procedure ShowLimit (AShow : boolean);
   public
@@ -88,17 +101,38 @@ implementation
 
 {$R *.DFM}
 
-uses System.DateUtils;
+uses System.DateUtils, Vcl.Themes, StyleUtils, GnuGetText, WinUtils,
+  ShowMessageDlg, BuConsts;
 
 { ---------------------------------------------------------------- }
 procedure TAdvancedScheduleDialog.FormCreate(Sender: TObject);
 begin
+  TranslateComponent (self);
+  dpExpire.Format:=DpShortDateFmt;
   dpExpire.Date:=Date;
+  dtExpire.Format:=TpShortTimeFmt;
   dtExpire.Time:=0.5;
   cbRepUnit.ItemIndex:=0;
   end;
 
 { ---------------------------------------------------------------- }
+procedure TAdvancedScheduleDialog.cbComboBoxDrawItem(Control: TWinControl; Index: Integer;
+  Rect: TRect; State: TOwnerDrawState);
+begin
+  with Control as TComboBox,Canvas do begin
+    with Font do if (odDisabled in State) then Color:=GetFontColor(sfComboBoxItemDisabled,clGrayText)
+    else if (odComboBoxEdit in State) then Color:=GetFontColor(sfComboBoxItemSelected,clWindowText)
+    else Color:=GetFontColor(sfComboBoxItemNormal,clWindowText);
+    with Brush do if (odSelected in State) and not (odComboBoxEdit in State) then
+      Color:=GetColor(scHintGradientEnd,clHighlight)
+    else Color:=GetColor(scComboBox,clWindow);
+    FillRect(Rect);
+    TextOut(Rect.Left, Rect.Top,' '+Items[Index]);
+    FillRect(Rect);
+    TextOut(Rect.Left, Rect.Top,' '+Items[Index]);
+    end;
+  end;
+
 procedure TAdvancedScheduleDialog.ShowRepeatPanel;
 var
   i : integer;
@@ -140,6 +174,7 @@ begin
     Max:=1439; Position:=30;
     udInterval.Increment:=10;
     end;
+  edInterval.Hint:=_('Number of ')+cbRepUnit.Text;
   end;
 
 procedure TAdvancedScheduleDialog.cbDurUnitCloseUp(Sender: TObject);
@@ -152,6 +187,7 @@ begin
     Max:=1439; Position:=30;
     udDuration.Increment:=10;
     end;
+  edDuration.Hint:=_('Number of ')+cbDurUnit.Text;
   end;
 
 procedure TAdvancedScheduleDialog.cbLimitUnitCloseUp(Sender: TObject);
@@ -167,6 +203,15 @@ begin
   else begin                                 // minutes
     Max:=1439; Position:=30;
     udInterval.Increment:=10;
+    end;
+  edLimit.Hint:=_('Number of ')+cbLimitUnit.Text;
+  end;
+
+procedure TAdvancedScheduleDialog.cbPowerClick(Sender: TObject);
+begin
+  with cbOnBatteries do begin
+    Enabled:=cbPower.Checked;
+    Checked:=cbPower.Checked;
     end;
   end;
 
@@ -215,6 +260,14 @@ begin
     ShowRepeatPanel;
     cbLimit.Checked:=UseLimit;
     cbReRun.Checked:=ReRun;
+    cbPower.Checked:=PowerOnly;
+    with cbOnBatteries do begin
+      Enabled:=cbPower.Checked;
+      if not Enabled then Checked:=false
+      else Checked:=StopBattery;
+      end;
+    cbWakeUp.Checked:=WakeUp;
+    cbNetwork.Checked:=NetworkOnly;
     ShowLimit(UseLimit);
     if (MinutesLimit mod 1440 =0) or (MinutesLimit>=10080) then begin
       cbLimitUnit.ItemIndex:=0;   // days
@@ -253,6 +306,10 @@ begin
     else MinutesLimit:=udLimit.Position;
     UseLimit:=cbLimit.Checked;
     ReRun:=cbReRun.Checked;
+    PowerOnly:=cbPower.Checked;
+    StopBattery:=cbOnBatteries.Checked;
+    WakeUp:=cbWakeUp.Checked;
+    NetworkOnly:=cbNetwork.Checked;
     end;
   end;
 

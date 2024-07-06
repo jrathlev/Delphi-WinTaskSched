@@ -188,8 +188,16 @@ uses System.Win.ComObj, System.DateUtils, System.StrUtils, Winapi.ActiveX,
 
 const
   StepPages : array [0..5] of integer = (0,1,2,3,4,4);
-  WakeUpTrigger = '<QueryList><Query Id="0" Path="System"><Select Path="System">*'+
-   '[System[Provider[@Name=''Microsoft-Windows-Power-Troubleshooter''] and EventID=1]]'+
+// event in Windows 10
+//  WakeUpTrigger = '<QueryList><Query Id="0" Path="System"><Select Path="System">*'+
+//   '[System[Provider[@Name=''Microsoft-Windows-Kernel-Power''] and EventID=107]]'+
+//   '</Select></Query></QueryList>';
+// event in Windows 11
+//  WakeUpTrigger11 = '<QueryList><Query Id="0" Path="System"><Select Path="System">*'+
+//   '[System[Provider[@Name=''Microsoft-Windows-Kernel-Power''] and EventID=507]]'+
+//   '</Select></Query></QueryList>';
+  WakeUpTriggerBoth = '<QueryList><Query Id="0" Path="System"><Select Path="System">*'+
+   '[System[Provider[@Name=''Microsoft-Windows-Kernel-Power''] and (EventID=107 or EventID=507)]]'+
    '</Select></Query></QueryList>';
 
 function UserName : string;
@@ -615,8 +623,10 @@ begin
   udDays.Position:=2;
   edDays.Enabled:=false; udDays.Enabled:=false; laDays.Enabled:=false;
   with AdvSet do begin
-    UseEndDate:=false; RepeatTask:=false; UseLimit:=false; ReRun:=false; StopEndDuration:=false;
-    MinutesInterval:=60; MinutesDuration:=1440; MinutesLimit:=4320;
+    UseEndDate:=false; RepeatTask:=false; UseLimit:=false; ReRun:=false;
+    PowerOnly:=true; StopBattery:=true; WakeUp:=false;
+    NetworkOnly:=false; StopEndDuration:=false;
+    MinutesInterval:=60; MinutesDuration:=480; MinutesLimit:=4320;
     EndDate:=ADateTime;
     end;
   ShowDelayValue(30,udRandom,cbRndUnit);
@@ -738,6 +748,10 @@ begin
     edPwd.Text:='';
     with Settings do begin
       AdvSet.ReRun:=RunIfMissed;
+      AdvSet.PowerOnly:=DisallowOnBatteries;
+      AdvSet.StopBattery:=StopOnBatteries;
+      AdvSet.WakeUp:=WakeToRun;
+      AdvSet.NetworkOnly:=RunOnlyIfNetwork;
       if Compatibility<=tcXP then Compatibility:=GetDefaultCompatibility;
       end;
     ok:=true;
@@ -844,7 +858,7 @@ begin
             else ok:=false;
             end;
         ttEvent : begin
-            if AnsiSameText(Subscription,WakeUpTrigger) then begin
+            if AnsiSameText(Subscription,WakeUpTriggerBoth) then begin
               rgCycle.ItemIndex:=5;
               laEvent.Caption:='On waking up the computer:';
               ShowActTime(EvAct);
@@ -878,6 +892,10 @@ begin
       Description:=leDesc.Text;
       if rbLoggedUser.Checked then LogonType:=ltToken else LogonType:=ltPassword;
       Settings.RunIfMissed:=AdvSet.ReRun;
+      Settings.DisallowOnBatteries:=AdvSet.PowerOnly;
+      Settings.StopOnBatteries:=AdvSet.StopBattery;
+      Settings.WakeToRun:=AdvSet.WakeUp;
+      Settings.RunOnlyIfNetwork:=AdvSet.NetworkOnly;
       with FTaskAction do begin
         WorkingDirectory:=MakeQuotedStr(edWorkDir.Text,[' ',',']);
         ApplicationPath:=edProg.Text;
@@ -966,7 +984,7 @@ begin
             RandomDelay:=GetDelayValue(cbRandom.Checked,udRandom,cbRndUnit)
             end;
         else begin     // ttEvent,ttLogon,ttBoot
-            if NewTrgType=ttEvent then Subscription:=WakeUpTrigger
+            if NewTrgType=ttEvent then Subscription:=WakeUpTriggerBoth
             else if NewTrgType=ttLogon then LogonUserId:=laUser.Caption;
             if cbActivate.Checked then begin
               bt:=tpEventTime.Time;

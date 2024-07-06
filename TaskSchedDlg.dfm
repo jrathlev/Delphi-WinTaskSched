@@ -24,7 +24,7 @@ object TaskScheduleDialog: TTaskScheduleDialog
     Top = 46
     Width = 465
     Height = 278
-    ActivePage = tsProgram
+    ActivePage = tsSchedule
     Align = alClient
     Style = tsButtons
     TabOrder = 1
@@ -175,15 +175,11 @@ object TaskScheduleDialog: TTaskScheduleDialog
         Top = 5
         Width = 256
         Height = 241
-        ActivePage = tsOneTime
+        ActivePage = tsEvent
         Style = tsButtons
         TabOrder = 2
         object tsDaily: TTabSheet
           TabVisible = False
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Label1: TLabel
             Left = 15
             Top = 25
@@ -388,10 +384,6 @@ object TaskScheduleDialog: TTaskScheduleDialog
           ParentShowHint = False
           ShowHint = False
           TabVisible = False
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Label4: TLabel
             Left = 15
             Top = 25
@@ -652,10 +644,6 @@ object TaskScheduleDialog: TTaskScheduleDialog
         object tsMonthly: TTabSheet
           ImageIndex = 2
           TabVisible = False
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object laMonth: TLabel
             Left = 10
             Top = 5
@@ -1213,10 +1201,6 @@ object TaskScheduleDialog: TTaskScheduleDialog
         object tsEvent: TTabSheet
           ImageIndex = 5
           TabVisible = False
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object laEvent: TLabel
             Left = 10
             Top = 5
@@ -1247,7 +1231,7 @@ object TaskScheduleDialog: TTaskScheduleDialog
           end
           object dpEventTime: TDateTimePicker
             Left = 25
-            Top = 55
+            Top = 60
             Width = 91
             Height = 21
             Date = 39626.618183761570000000
@@ -1258,7 +1242,7 @@ object TaskScheduleDialog: TTaskScheduleDialog
           end
           object tpEventTime: TDateTimePicker
             Left = 125
-            Top = 55
+            Top = 60
             Width = 76
             Height = 21
             Date = 39626.613225104170000000
