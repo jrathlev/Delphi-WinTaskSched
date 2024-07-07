@@ -101,16 +101,12 @@ implementation
 
 {$R *.DFM}
 
-uses System.DateUtils, Vcl.Themes, StyleUtils, GnuGetText, WinUtils,
-  ShowMessageDlg, BuConsts;
+uses System.DateUtils;
 
 { ---------------------------------------------------------------- }
 procedure TAdvancedScheduleDialog.FormCreate(Sender: TObject);
 begin
-  TranslateComponent (self);
-  dpExpire.Format:=DpShortDateFmt;
   dpExpire.Date:=Date;
-  dtExpire.Format:=TpShortTimeFmt;
   dtExpire.Time:=0.5;
   cbRepUnit.ItemIndex:=0;
   end;
@@ -120,12 +116,11 @@ procedure TAdvancedScheduleDialog.cbComboBoxDrawItem(Control: TWinControl; Index
   Rect: TRect; State: TOwnerDrawState);
 begin
   with Control as TComboBox,Canvas do begin
-    with Font do if (odDisabled in State) then Color:=GetFontColor(sfComboBoxItemDisabled,clGrayText)
-    else if (odComboBoxEdit in State) then Color:=GetFontColor(sfComboBoxItemSelected,clWindowText)
-    else Color:=GetFontColor(sfComboBoxItemNormal,clWindowText);
-    with Brush do if (odSelected in State) and not (odComboBoxEdit in State) then
-      Color:=GetColor(scHintGradientEnd,clHighlight)
-    else Color:=GetColor(scComboBox,clWindow);
+    with Font do if (odDisabled in State) then Color:=clGrayText
+    else if (odComboBoxEdit in State) then Color:=clWindowText
+    else Color:=clWindowText;
+    with Brush do if (odSelected in State) and not (odComboBoxEdit in State) then Color:=clHighlight
+    else Color:=clWindow;
     FillRect(Rect);
     TextOut(Rect.Left, Rect.Top,' '+Items[Index]);
     FillRect(Rect);
@@ -174,7 +169,7 @@ begin
     Max:=1439; Position:=30;
     udInterval.Increment:=10;
     end;
-  edInterval.Hint:=_('Number of ')+cbRepUnit.Text;
+  edInterval.Hint:='Number of '+cbRepUnit.Text;
   end;
 
 procedure TAdvancedScheduleDialog.cbDurUnitCloseUp(Sender: TObject);
@@ -187,7 +182,7 @@ begin
     Max:=1439; Position:=30;
     udDuration.Increment:=10;
     end;
-  edDuration.Hint:=_('Number of ')+cbDurUnit.Text;
+  edDuration.Hint:='Number of '+cbDurUnit.Text;
   end;
 
 procedure TAdvancedScheduleDialog.cbLimitUnitCloseUp(Sender: TObject);
@@ -204,7 +199,7 @@ begin
     Max:=1439; Position:=30;
     udInterval.Increment:=10;
     end;
-  edLimit.Hint:=_('Number of ')+cbLimitUnit.Text;
+  edLimit.Hint:='Number of '+cbLimitUnit.Text;
   end;
 
 procedure TAdvancedScheduleDialog.cbPowerClick(Sender: TObject);

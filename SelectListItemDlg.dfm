@@ -2,10 +2,9 @@ object SelectListItemDialog: TSelectListItemDialog
   Left = 337
   Top = 316
   ActiveControl = lbxStringList
-  BorderStyle = bsDialog
   Caption = 'Change order of list items'
-  ClientHeight = 278
-  ClientWidth = 313
+  ClientHeight = 276
+  ClientWidth = 303
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,6 +13,9 @@ object SelectListItemDialog: TSelectListItemDialog
   Font.Style = []
   OldCreateOrder = True
   Position = poMainFormCenter
+  DesignSize = (
+    303
+    276)
   PixelsPerInch = 96
   TextHeight = 13
   object lbDesc: TLabel
@@ -25,8 +27,9 @@ object SelectListItemDialog: TSelectListItemDialog
   object OKBtn: TBitBtn
     Left = 195
     Top = 205
-    Width = 113
+    Width = 101
     Height = 31
+    Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
     Glyph.Data = {
@@ -87,8 +90,9 @@ object SelectListItemDialog: TSelectListItemDialog
   object CancelBtn: TBitBtn
     Left = 195
     Top = 240
-    Width = 113
+    Width = 101
     Height = 31
+    Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'
     Glyph.Data = {
@@ -151,6 +155,7 @@ object SelectListItemDialog: TSelectListItemDialog
     Top = 20
     Width = 181
     Height = 251
+    Anchors = [akLeft, akTop, akRight, akBottom]
     ItemHeight = 13
     TabOrder = 2
     OnDblClick = lbxStringListDblClick

@@ -137,6 +137,8 @@ type
     edDelay: TEdit;
     udRandom: TUpDown;
     edRandom: TEdit;
+    btEventEdit: TBitBtn;
+    btEventReset: TBitBtn;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure rgCycleClick(Sender: TObject);
@@ -159,9 +161,12 @@ type
     procedure cbMondayClick(Sender: TObject);
     procedure cbJanClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure btEventResetClick(Sender: TObject);
+    procedure btEventEditClick(Sender: TObject);
   private
     { Private declarations }
     AdvSet : TAdvancedSettings;
+    wut    : string; // wake up trigger
     procedure ShowRandom (AShow : boolean);
     procedure ShowActTime(AShow : boolean);
     procedure ShowDelay (AShow : boolean);
@@ -184,7 +189,7 @@ implementation
 {$R *.dfm}
 
 uses System.Win.ComObj, System.DateUtils, System.StrUtils, Winapi.ActiveX,
-  Vcl.FileCtrl, TaskSchedApi;
+  Vcl.FileCtrl, TaskSchedApi, MemoDlg;
 
 const
   StepPages : array [0..5] of integer = (0,1,2,3,4,4);
@@ -305,6 +310,7 @@ begin
   laWeek.Font.Height:=h;
   laMonth.Font.Height:=h;
   laSingle.Font.Height:=h;
+  wut:=WakeUpTriggerBoth;
   end;
 
 procedure TTaskScheduleDialog.FormDestroy(Sender: TObject);
@@ -438,6 +444,20 @@ begin
       ModalResult:=mrOK;
       end;
     end;
+  end;
+
+procedure TTaskScheduleDialog.btEventEditClick(Sender: TObject);
+var
+  s : string;
+begin
+  s:=AnsiReplaceText(wut,'><','>'+sLineBreak+'<');
+  if MemoDialog.Execute(laEvent.Caption,
+      'Query string to select the event:',s) then wut:=AnsiReplaceText(s,sLineBreak,'');
+  end;
+
+procedure TTaskScheduleDialog.btEventResetClick(Sender: TObject);
+begin
+  wut:=WakeUpTriggerBoth;
   end;
 
 procedure TTaskScheduleDialog.btnBackClick(Sender: TObject);
@@ -858,15 +878,13 @@ begin
             else ok:=false;
             end;
         ttEvent : begin
-            if AnsiSameText(Subscription,WakeUpTriggerBoth) then begin
-              rgCycle.ItemIndex:=5;
-              laEvent.Caption:='On waking up the computer:';
-              ShowActTime(EvAct);
-              ShowActTime(cbActivate.Checked);
-              ShowDelayValue(Delay,udDelay,cbDelUnit);
-              ShowDelay(Delay>0);
-              end
-            else ok:=false;
+//            if AnsiSameText(Subscription,WakeUpTriggerBoth) then begin
+            wut:=Subscription;
+            rgCycle.ItemIndex:=5;
+            laEvent.Caption:='On waking up the computer:';
+            ShowActTime(EvAct);
+            ShowDelay(Delay>0);
+            ShowDelayValue(Delay,udDelay,cbDelUnit);
             end;
         else ok:=false; // unsupported trigger
           end;
@@ -984,7 +1002,7 @@ begin
             RandomDelay:=GetDelayValue(cbRandom.Checked,udRandom,cbRndUnit)
             end;
         else begin     // ttEvent,ttLogon,ttBoot
-            if NewTrgType=ttEvent then Subscription:=WakeUpTriggerBoth
+            if NewTrgType=ttEvent then Subscription:=wut
             else if NewTrgType=ttLogon then LogonUserId:=laUser.Caption;
             if cbActivate.Checked then begin
               bt:=tpEventTime.Time;
