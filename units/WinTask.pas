@@ -16,7 +16,7 @@
    Vers. 2.1 - March 2023 -  Repetition trigger fixed
    Vers. 2.2 - March 2023 - structure of WinTask redesigned (separate settings object)
    Vers. 2.3 - January 2024 - added: XML export
-   last modified: January 2024
+   last modified: November 2024
    *)
 
 unit WinTask;
@@ -577,7 +577,7 @@ begin
 function GetServiceStatusByName(const AServer,AServiceName : string) : TWinServiceState;
 var
   ServiceHandle,
-  SCMHandle: DWORD;
+  SCMHandle: SC_HANDLE;
   SCMAccess,Access:DWORD;
   ServiceStatus: TServiceStatus;
 {$IFDEF Trace}
