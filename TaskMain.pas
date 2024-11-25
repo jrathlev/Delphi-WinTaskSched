@@ -52,6 +52,7 @@ type
     XmlSaveDialog: TSaveTextFileDialog;
     btbImport: TBitBtn;
     XmlOpenDialog: TOpenDialog;
+    paBottom: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
