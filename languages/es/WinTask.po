@@ -1,0 +1,393 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: WinTaskScheduler\n"
+"POT-Creation-Date: 2024-11-25 23:10+0100\n"
+"PO-Revision-Date: 2025-06-03 15:32+0200\n"
+"Last-Translator: J. Rathlev <kontakt@rathlev-home.de>\n"
+"Language-Team: M.A.G. <xxxxx@gmail.com>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Delphi Get Text (3.1.1)\n"
+"X-Poedit-SourceCharset: ISO-8859-1\n"
+
+#. Programmer's name for it: rsFormatError
+#: WinTaskConsts.pas:22
+msgid "Format error: "
+msgstr "Error de formato: "
+
+#. Unbekannt
+#. Programmer's name for it: rsTrgUnknown
+#: WinTaskConsts.pas:24
+msgid "Unknown"
+msgstr "Desconocido"
+
+#. Bereit
+#. Programmer's name for it: rsTrgReady
+#: WinTaskConsts.pas:25
+msgid "Ready"
+msgstr "Listo"
+
+#. In Warteschlange
+#. Programmer's name for it: rsTrgQueued
+#: WinTaskConsts.pas:26
+msgid "Queued"
+msgstr "En espera"
+
+#. Wird ausgeführt
+#. Programmer's name for it: rsTrgRunning
+#: WinTaskConsts.pas:27
+msgid "Running"
+msgstr "Ejecutando"
+
+#. Deaktiviert
+#. Programmer's name for it: rsTrgDisabled
+#: WinTaskConsts.pas:28
+msgid "Disabled"
+msgstr "Desactivado"
+
+#. Programm starten
+#. Programmer's name for it: rsTrgActionExec
+#: WinTaskConsts.pas:30
+msgid "Start a program"
+msgstr "Iniciar un programa"
+
+#. Programmer's name for it: rsTragActionCom
+#: WinTaskConsts.pas:31
+msgid "File handler"
+msgstr "Gestor de ficheros"
+
+#. E-Mail senden
+#. Programmer's name for it: rsTragActionMail
+#: WinTaskConsts.pas:32
+msgid "Send an email"
+msgstr "Enviar un correo"
+
+#. Meldung anzeigen
+#. Programmer's name for it: rsTragActionMsg
+#: WinTaskConsts.pas:33
+msgid "Display a message"
+msgstr "Mostrar un mensaje"
+
+#. Bei einem Ereignis
+#. Programmer's name for it: rsTrgTypeEvent
+#: WinTaskConsts.pas:35
+#. Bei einem Ereignis
+#. Programmer's name for it: rsTrgEvent
+#: WinTaskConsts.pas:82
+msgid "On an event"
+msgstr "En un evento"
+
+#. Einmal
+#. Programmer's name for it: rsTrgTypeTime
+#: WinTaskConsts.pas:36
+msgid "One time"
+msgstr "Una vez"
+
+#. Täglich
+#. Programmer's name for it: rsTrgTypeDaily
+#: WinTaskConsts.pas:37
+msgid "Daily"
+msgstr "Diariamente"
+
+#. Wöchentlich
+#. Programmer's name for it: rsTrgTypeWeekly
+#: WinTaskConsts.pas:38
+msgid "Weekly"
+msgstr "Semanalmente"
+
+#. Monatlich
+#. Programmer's name for it: rsTrgTypeMonthly
+#: WinTaskConsts.pas:39
+msgid "Monthly"
+msgstr "Mensualmente"
+
+#. Im Leerlauf
+#. Programmer's name for it: rsTrgTypeIdle
+#: WinTaskConsts.pas:40
+msgid "On idle"
+msgstr "Inactivo"
+
+#. Bei Aufgabenerstellung/-änderung
+#. Programmer's name for it: rsTrgTypeRegister
+#: WinTaskConsts.pas:41
+msgid "On task creation/modification"
+msgstr "Al crear/modificar una tarea"
+
+#. Beim Start
+#. Programmer's name for it: rsTrgTypeStartup
+#: WinTaskConsts.pas:42
+msgid "At startup"
+msgstr "Al iniciar"
+
+#. Bei Anmeldung
+#. Programmer's name for it: rsTrgTypeLogon
+#: WinTaskConsts.pas:43
+msgid "At log on"
+msgstr "Àl iniciar sesión"
+
+#. Programmer's name for it: rsTrgTypeStateChg
+#: WinTaskConsts.pas:44
+msgid "On session state change"
+msgstr "Al cambiar el estado de sesión"
+
+#. Programmer's name for it: rsTrgTypeCustom
+#: WinTaskConsts.pas:45
+msgid "Custom trigger"
+msgstr "Activador personalizado"
+
+#. Ersten
+#. Programmer's name for it: rsTrgFirst
+#: WinTaskConsts.pas:47
+msgid "First"
+msgstr "Primero"
+
+#. Zweiten
+#. Programmer's name for it: rsTrgSecond
+#: WinTaskConsts.pas:48
+msgid "Second"
+msgstr "Segundo"
+
+#. Dritten
+#. Programmer's name for it: rsTrgThird
+#: WinTaskConsts.pas:49
+msgid "Third"
+msgstr "Tercero"
+
+#. Vierten
+#. Programmer's name for it: rsTrgFourth
+#: WinTaskConsts.pas:50
+msgid "Fourth"
+msgstr "Cuarto"
+
+#. Fünften
+#. Programmer's name for it: rsTrgFifth
+#: WinTaskConsts.pas:51
+msgid "Fifth"
+msgstr "Quinto"
+
+#. Letzten
+#. Programmer's name for it: rsTrgLast
+#: WinTaskConsts.pas:52
+msgid "Last"
+msgstr "Último"
+
+#. Sekunde
+#. Programmer's name for it: rsTrgSec
+#: WinTaskConsts.pas:54
+msgid "second"
+msgstr "segundo"
+
+#. Sekunden
+#. Programmer's name for it: rsTrgSecs
+#: WinTaskConsts.pas:55
+msgid "seconds"
+msgstr "segundos"
+
+#. jede Sekunde
+#. Programmer's name for it: rsTrgEverySec
+#: WinTaskConsts.pas:56
+msgid "every second"
+msgstr "cada segundo"
+
+#. alle %u Sekunden
+#. Programmer's name for it: rsTrgEverySecs
+#: WinTaskConsts.pas:57
+msgid "every %u seconds"
+msgstr "cada %u segundos"
+
+#. Minute
+#. Programmer's name for it: rsTrgMin
+#: WinTaskConsts.pas:58
+msgid "minute"
+msgstr "minuto"
+
+#. Minuten
+#. Programmer's name for it: rsTrgMins
+#: WinTaskConsts.pas:59
+msgid "minutes"
+msgstr "minutos"
+
+#. jede Minute
+#. Programmer's name for it: rsTrgEveryMin
+#: WinTaskConsts.pas:60
+msgid "every minute"
+msgstr "cada minuto"
+
+#. alle %u Minuten
+#. Programmer's name for it: rsTrgEveryMins
+#: WinTaskConsts.pas:61
+msgid "every %u minutes"
+msgstr "cada %u minutos"
+
+#. Stunde
+#. Programmer's name for it: rsTrgHour
+#: WinTaskConsts.pas:62
+msgid "hour"
+msgstr "hora"
+
+#. Stunden
+#. Programmer's name for it: rsTrgHours
+#: WinTaskConsts.pas:63
+msgid "hours"
+msgstr "horas"
+
+#. jede Stunde
+#. Programmer's name for it: rsTrgEveryHour
+#: WinTaskConsts.pas:64
+msgid "every hour"
+msgstr "cada hora"
+
+#. alle %u Stunden
+#. Programmer's name for it: rsTrgEveryHours
+#: WinTaskConsts.pas:65
+msgid "every %u hours"
+msgstr "cada %u horas"
+
+#. Tag
+#. Programmer's name for it: rsTrgDay
+#: WinTaskConsts.pas:66
+msgid "day"
+msgstr "día"
+
+#. Tage
+#. Programmer's name for it: rsTrgDays
+#: WinTaskConsts.pas:67
+msgid "%u days"
+msgstr "%u días"
+
+#. jeden Tag
+#. Programmer's name for it: rsTrgEveryDay
+#: WinTaskConsts.pas:68
+msgid "every day"
+msgstr "cada día"
+
+#. alle %u Tage
+#. Programmer's name for it: rsTrgEveryDays
+#: WinTaskConsts.pas:69
+msgid "every %u days"
+msgstr "cad %u días"
+
+#. Um %0:s am %1:s
+#. Programmer's name for it: rsTrgOnce
+#: WinTaskConsts.pas:70
+msgid "At %0:s on %1:s"
+msgstr "A las %0:s del %1:s"
+
+#. Jeden Tag um %s
+#. Programmer's name for it: rsTrgDailyAt
+#: WinTaskConsts.pas:72
+msgid "At %s every day"
+msgstr "A las %s de cada día"
+
+#. Um %0:s alle %1:u Tage
+#. Programmer's name for it: rsTrgRDailyAt
+#: WinTaskConsts.pas:73
+msgid "At %0:s every %1:u days"
+msgstr "A las %0:s cada %1:u día(s)"
+
+#. Wöchentlich um %0:s jeden %1:s, beginnend mit dem %2:s
+#. Programmer's name for it: rsTrgWeekly
+#: WinTaskConsts.pas:74
+msgid "At %0:s every %1:s of every week, starting "
+"%2:s"
+msgstr "A las %0:s cada %1:s semana, a partir de "
+"%2:s"
+
+#. Um %0:s jeden %1:s alle %2:u Wochen, beginnend mit dem %3:s
+#. Programmer's name for it: rsTrgRWeekly
+#: WinTaskConsts.pas:75
+msgid "At %0:s every %1:s of every %2:u weeks, starting "
+"%3:s"
+msgstr "A las %0:s cada %1:de cada %2:u semana, a partir de "
+"%3:s"
+
+#. Um %0:s am %1:s %2:s, beginnend mit dem %3:s
+#. Programmer's name for it: rsTrgMonthly
+#: WinTaskConsts.pas:76
+msgid "At %0:s on %1:s of %2:s, starting %3:s"
+msgstr "A las %0:s el %1:s de %2:s, a partir de "
+"%3:s"
+
+#. Wird am %0:s %1:s jeden %2:s beginnend mit dem %3:s ausgeführt
+#. Programmer's name for it: rsTrgDMonthly
+#: WinTaskConsts.pas:77
+msgid "Runs on the %0:s %1:s, each %2:s starting "
+"%3:s"
+msgstr "Se ejecuta el %0:s %1:s, cada %2:s  a partir de "
+"%3:s"
+
+#. Programmer's name for it: rsTrgAnyLogon
+#: WinTaskConsts.pas:78
+msgid "At logon of any user"
+msgstr "Al iniciar sesión de cualquier usuario"
+
+#. Bei Anmeldung eines Benutzers
+#. Programmer's name for it: rsTrgLogon
+#: WinTaskConsts.pas:79
+msgid "At logon of %s"
+msgstr "Al iniciar sesión de %s"
+
+#. Beim Systemstart
+#. Programmer's name for it: rsTrgStartup
+#: WinTaskConsts.pas:80
+msgid "At system startup"
+msgstr "Al iniciar el sistema"
+
+#. Wenn der Computer inaktiv ist
+#. Programmer's name for it: rsTrgIdle
+#: WinTaskConsts.pas:81
+msgid "When computer is idle"
+msgstr "Cuando el equipo esté inactivo"
+
+#. Programmer's name for it: rsTrgEventTime
+#: WinTaskConsts.pas:83
+msgid ", starting at %0:s on %1:s"
+msgstr ", a partir de %0:s del %1:s"
+
+#. Bei Aufgabenerstellung oder -änderung
+#. Programmer's name for it: rsTrgRegistration
+#: WinTaskConsts.pas:85
+msgid "When task is created or modified"
+msgstr "Al crear o modificar una tarea"
+
+#. Nach Auslösung alle %0:s für die Dauer von %1:s wiederholen
+#. Programmer's name for it: rsTrgRepeat
+#: WinTaskConsts.pas:87
+msgid " - After triggered, repeat every %0:s for a duration of "
+"%1:s"
+msgstr " - Tras activarse, repetir cada %0:s durante "
+"%1:s"
+
+#. Programmer's name for it: rsCompAT
+#: WinTaskConsts.pas:89
+msgid "deprecated"
+msgstr "obsoleto"
+
+#. Programmer's name for it: rsXP
+#: WinTaskConsts.pas:90
+msgid "Windows XP"
+msgstr "Windows XP"
+
+#. Programmer's name for it: rsVista
+#: WinTaskConsts.pas:91
+msgid "Windows Vista"
+msgstr "Windows Vista"
+
+#. Programmer's name for it: rsWin7
+#: WinTaskConsts.pas:92
+msgid "Windows 7"
+msgstr "Windows 7"
+
+#. Programmer's name for it: rsWin10
+#: WinTaskConsts.pas:93
+msgid "Windows 10"
+msgstr "Windows 10"
+

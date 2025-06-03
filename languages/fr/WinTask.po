@@ -1,0 +1,208 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2024-11-25 23:10+0100\n"
+"PO-Revision-Date: 2025-06-03 11:21+0200\n"
+"Last-Translator: J. Rathlev <kontakt@rathlev-home.de>\n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
+
+msgid "Format error: "
+msgstr "Erreur de format : "
+
+msgid "Unknown"
+msgstr "Inconnu"
+
+msgid "Ready"
+msgstr "Prêt"
+
+msgid "Queued"
+msgstr "En attente"
+
+msgid "Running"
+msgstr "Exécution en cours"
+
+msgid "Disabled"
+msgstr "Désactivé"
+
+msgid "Start a program"
+msgstr "Démarrer un programme"
+
+msgid "File handler"
+msgstr "Fichier handler"
+
+msgid "Send an email"
+msgstr "Envoyer un courriel"
+
+msgid "Display a message"
+msgstr "Afficher un message"
+
+msgid "On an event"
+msgstr "Sur un événement"
+
+msgid "One time"
+msgstr "Une fois"
+
+msgid "Daily"
+msgstr "Par jour"
+
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+msgid "Monthly"
+msgstr "Mensuel"
+
+msgid "On idle"
+msgstr "Au ralenti"
+
+msgid "On task creation/modification"
+msgstr "Lors de la création/modification de tâches"
+
+msgid "At startup"
+msgstr "Au démarrage"
+
+msgid "At log on"
+msgstr "À l'ouverture de session"
+
+msgid "On session state change"
+msgstr "Au changement d'état de session"
+
+msgid "Custom trigger"
+msgstr "Déclencheur personnalisé"
+
+msgid "First"
+msgstr "Premier"
+
+msgid "Second"
+msgstr "Seconde"
+
+msgid "Third"
+msgstr "Troisième"
+
+msgid "Fourth"
+msgstr "Quatrième"
+
+msgid "Fifth"
+msgstr "Cinquième"
+
+msgid "Last"
+msgstr "Dernier"
+
+msgid "second"
+msgstr "seconde"
+
+msgid "seconds"
+msgstr "secondes"
+
+msgid "every second"
+msgstr "chaque seconde"
+
+msgid "every %u seconds"
+msgstr "toutes les %u secondes"
+
+msgid "minute"
+msgstr "minute"
+
+msgid "minutes"
+msgstr "minutes"
+
+msgid "every minute"
+msgstr "chaque minute"
+
+msgid "every %u minutes"
+msgstr "toutes les %u minutes"
+
+msgid "hour"
+msgstr "heure"
+
+msgid "hours"
+msgstr "heures"
+
+msgid "every hour"
+msgstr "toutes les heures"
+
+msgid "every %u hours"
+msgstr "toutes les %u heures"
+
+msgid "day"
+msgstr "jour"
+
+msgid "%u days"
+msgstr "%u jours"
+
+msgid "every day"
+msgstr "chaque jour"
+
+msgid "every %u days"
+msgstr "tous les %u jours"
+
+msgid "At %0:s on %1:s"
+msgstr "À %0:s le %1:s"
+
+msgid "At %s every day"
+msgstr "À %s tous les jours"
+
+msgid "At %0:s every %1:u days"
+msgstr "À %0:s tous les %1:u jours"
+
+msgid "At %0:s every %1:s of every week, starting %2:s"
+msgstr "À %0:s tous les %1:s semaine, à partir du %2:s"
+
+msgid "At %0:s every %1:s of every %2:u weeks, starting %3:s"
+msgstr ""
+"À %0:s tous les %1:s chaque %2:u semaine, à partir du %3:s"
+
+msgid "At %0:s on %1:s of %2:s, starting %3:s"
+msgstr "À %0:s le %1:s de %2:s, à partir du %3:s"
+
+msgid "Runs on the %0:s %1:s, each %2:s starting %3:s"
+msgstr "S'exécute le %0:s %1:s, de chaque %2:s à partir du %3:s"
+
+msgid "At logon of any user"
+msgstr "À l'ouverture de session d'un utilisateur"
+
+msgid "At logon of %s"
+msgstr "À l'ouverture de session de %s"
+
+msgid "At system startup"
+msgstr "Au démarrage"
+
+msgid "When computer is idle"
+msgstr "Lorsque l’ordinateur est inactif"
+
+msgid ", starting at %0:s on %1:s"
+msgstr ", démarrage à %0:s le %1:s"
+
+msgid "When task is created or modified"
+msgstr "Lors de la création ou de la modification de la tâche"
+
+msgid ""
+" - After triggered, repeat every %0:s for a duration of %1:s"
+msgstr ""
+" - Après le déclenchement, recommencer toutes les %0:s heures "
+"pendant %1:s"
+
+msgid "deprecated"
+msgstr "déconseillée"
+
+msgid "Windows XP"
+msgstr "Windows XP"
+
+msgid "Windows Vista"
+msgstr "Windows Vista"
+
+msgid "Windows 7"
+msgstr "Windows 7"
+
+msgid "Windows 10"
+msgstr "Windows 10"
